@@ -116,78 +116,78 @@ docker run -p 8000:8000 akamart/lf-be-todo
 
 ### Get All Tasks
 
-- **Route:** `GET /tasks`
+- **Route:** `GET /task`
 - **Handler Function:** `getAllTasks`
 - **Description:** Retrieves all tasks.
-- **Response Data:** A list of all tasks.
+- **Response Data:** A array of json of all tasks.
 
 ### Get Task by ID
 
-- **Route:** `GET /tasks/:id`
+- **Route:** `GET /task/:id`
 - **Handler Function:** `getTaskById`
 - **Description:** Retrieves a task by its ID.
 - **Request Parameter:**
   - `id`: The ID of the task to retrieve.
-- **Response Data:** The task object with the specified ID.
+- **Response Data:** The task JSON with the specified ID.
 
 ### Create Task
 
-- **Route:** `POST /tasks`
+- **Route:** `POST /task`
 - **Handler Function:** `createTask`
 - **Description:** Creates a new task.
 - **Request Body:**
   - `detail`: The detail of the task to create. Request must be raw json with { "detail" : "\<taskdetail>" }.
-- **Response Data:** A message indicating the task was created, including the task's detail, ID, and status.
+- **Response Data:** JSON of created task
 
 ### Update Task by ID
 
-- **Route:** `PUT /tasks/:id`
+- **Route:** `PUT /task/:id`
 - **Handler Function:** `updateTaskById`
 - **Description:** Updates an existing task by its ID.
 - **Request Parameter:**
   - `id`: The ID of the task to update.
 - **Request Body:** The new details of the task to update. <br> Request must be raw json with { "detail" : "\<taskdetail>" , "status" : <"pending" or "done"> }. <br>Either field maybe omitted.
-- **Response Data:** A message indicating the task was updated, including the task's ID, status, and detail, or an error message if the update was unsuccessful.
+- **Response Data:** JSON of updated task.
 
 ### Delete Task by ID
 
-- **Route:** `DELETE /tasks/:id`
+- **Route:** `DELETE /task/:id`
 - **Handler Function:** `deleteTaskById`
 - **Description:** Deletes a task by its ID.
 - **Request Parameter:**
   - `id`: The ID of the task to delete.
-- **Response Data:** A message indicating the task was deleted, or an error message if the task was not found.
+- **Response Data:** JSON of id of task deleted.
 
 ## Example Usage
 
 - **Get All Tasks**
 
   ```bash
-  curl -X GET http://localhost:8000/tasks
+  curl -X GET http://localhost:8000/task
   ```
 
 - **Get Task by ID**
 
   ```bash
-  curl -X GET http://localhost:8000/tasks/{id}
+  curl -X GET http://localhost:8000/task/{id}
   ```
 
 - **Create Task**
 
   ```bash
-  curl -X POST http://localhost:8000/tasks -H "Content-Type: application/json" -d '{"detail": "New Task"}'
+  curl -X POST http://localhost:8000/task -H "Content-Type: application/json" -d '{"detail": "New Task"}'
   ```
 
 - **Update Task by ID**
 
   ```bash
-  curl -X PUT http://localhost:8000/tasks/{id} -H "Content-Type: application/json" -d '{"detail": "Updated Task", "status": "completed"}'
+  curl -X PUT http://localhost:8000/task/{id} -H "Content-Type: application/json" -d '{"detail": "Updated Task", "status": "completed"}'
   ```
 
 - **Delete Task by ID**
 
   ```bash
-  curl -X DELETE http://localhost:8000/tasks/{id}
+  curl -X DELETE http://localhost:8000/task/{id}
   ```
 
 ## Folder Structure
