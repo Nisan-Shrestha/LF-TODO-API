@@ -1,10 +1,16 @@
-# LF-backend-todo
+# LF-backend-todo (DAY1)
 
 LF-backend-todo is a simple backend service for managing a todo list. It is built using Node.js, Express, and TypeScript, and it includes Docker support for easy deployment.
+DAY-1 consists of few simple api routes.
+
+## Assignment Tasks
+
+- Create a basic CRUD ToDo app API with Node.js and Express
 
 ## Table of Contents
 
-- [LF-backend-todo](#lf-backend-todo)
+- [LF-backend-todo (DAY1)](#lf-backend-todo-day1)
+  - [Assignment Tasks](#assignment-tasks)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
