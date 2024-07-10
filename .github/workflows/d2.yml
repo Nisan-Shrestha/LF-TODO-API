@@ -3,10 +3,10 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - day2
   pull_request:
     branches:
-      - main
+      - day2
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,5 +25,5 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          tags: akamart/lf-be-todo:latest
+          tags: akamart/lf-be-todo-d2:latest
 

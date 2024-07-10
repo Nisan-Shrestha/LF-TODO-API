@@ -1,82 +1,91 @@
-import { ITask, ITask as Task, TaskStatus } from "../interfaces/Task";
+import { UUID } from "crypto";
+import { ITask, TaskStatus } from "../interfaces/Task";
+import fs from "fs/promises";
+import path from "node:path";
+import e from "express";
 
-const tasks = [
-  {
-    id: "0",
-    detail: "Do the laundry",
-    status: TaskStatus.pending,
-  },
-  {
-    id: "1",
-    detail: "Read Node.js Docs",
-    status: TaskStatus.pending,
-  },
-  {
-    id: "2",
-    detail: "Push to Docker",
-    status: TaskStatus.done,
-  },
-];
+const pathToTasks = path.join(__dirname, "../data/tasks.json");
 
-export function getAllTasks() {
-  return tasks;
+export async function getAllTasks(userId: UUID): Promise<ITask[]> {
+  const tasks = await readTasksFromFile();
+  return tasks.filter(({ userID: uid }) => uid === userId);
 }
 
-export function getTaskById(id: string) {
-  return tasks.find((task) => task.id === id);
-}
-
-export function createTask(detail: string): ITask {
-  let newId = tasks.length.toString();
-
-  while (tasks.find((task) => task.id === newId) !== undefined) {
-    newId = Math.trunc(Math.random() * 1000).toString();
-  }
-
-  const newTask = { detail: detail, id: newId, status: TaskStatus.pending };
-  tasks.push(newTask);
-
-  return newTask;
-}
-
-export function updateTaskById(
-  id: string,
-  body: { detail: string; status: string }
-): ITask | string {
-  let taskToUpdate = tasks.find((task) => task.id === id);
-
-  if (taskToUpdate === undefined) {
-    return `Error, could not find task with id: ${id}`;
-  }
-
-  if (body.status) {
-    if (body.status === "done") {
-      taskToUpdate.status = TaskStatus.done;
-    } else if (body.status === "pending") {
-      taskToUpdate.status = TaskStatus.pending;
-    } else {
-      return `Error, invalid status: ${body.status} ,  send 'done' or 'pending' as status in body of the request`;
+export async function getTaskById(taskId:UUID, userId: UUID) {
+  try {
+    const tasks = await readTasksFromFile();
+    const data = tasks.find(
+      ({ userID: uid, id: tid }) => uid === userId && tid === taskId
+    );
+    if (!data) {
+      throw new Error(`Task with id:${taskId} not found`);
+    }
+    return data;
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message);
     }
   }
-
-  if (body.detail) {
-    taskToUpdate.detail = body.detail;
-  }
-
-  return taskToUpdate;
 }
 
-export function deleteTaskById(id: string): boolean {
-  let taskToDelete = tasks.find((task) => task.id === id);
+export async function createTask(task: ITask) {
+  const tasks = await readTasksFromFile();
+  tasks.push(task);
+  await writeTasksToFile(tasks);
+  return task;
+}
 
-  if (taskToDelete === undefined) {
-    return false;
+export async function updateTask(tid: UUID, detail: string, uid: UUID) {
+  const tasks = await readTasksFromFile();
+  const task = tasks.find((task) => task.id === tid && task.userID === uid);
+  if (!task) return null;
+  task.detail = detail;
+  return task;
+}
+
+export async function updateTaskStatus(tid: UUID, status: string, uid: UUID) {
+  const tasks = await readTasksFromFile();
+  const task = tasks.find((task) => task.id === tid && task.userID === uid);
+  if (!task) return null;
+  if (status == "done") task.status = TaskStatus.done;
+  if (status == "pending") task.status = TaskStatus.pending;
+  if (task.status == TaskStatus.done) {
+    task.completedAt = new Date();
   }
-  const taskIndex = tasks.indexOf(taskToDelete);
+  await writeTasksToFile(tasks);
+  return task;
+}
+
+export async function deleteTask(id: UUID, uid: UUID) {
+  const tasks = await readTasksFromFile();
+  const taskIndex = tasks.findIndex(
+    (task) => task.id === id && task.userID === uid
+  );
   if (taskIndex === -1) {
-    return false;
+    return null;
   }
 
-  tasks.splice(taskIndex, 1);
-  return true;
+  const [deletedTask] = tasks.splice(taskIndex, 1);
+  await writeTasksToFile(tasks);
+
+  return deletedTask;
+}
+
+async function readTasksFromFile() {
+  try {
+    const taskData = await fs.readFile(pathToTasks, "utf8");
+    const parsedData: ITask[] = JSON.parse(taskData);
+    return parsedData;
+  } catch (error) {
+    throw new Error("Error reading task data");
+  }
+}
+
+async function writeTasksToFile(task: ITask[]) {
+  try {
+    const data = JSON.stringify(task);
+    await fs.writeFile(pathToTasks, data, "utf8");
+  } catch (error) {
+    throw new Error("Error Writing task data to file");
+  }
 }

@@ -6,19 +6,15 @@ import {
   deleteTaskById,
   updateTaskById,
 } from "../controller/Task";
+import { auth } from "../middleware/auth";
 
 const router = express();
 
-router.get("/", getAllTasks);
-router.get("/:id", getTaskById);
+router.get("/", auth, getAllTasks);
+router.get("/:id", auth, getTaskById);
 
-router.post("/", createTask);
-
-router.put("/:id", updateTaskById);
-
-// router.put("/:id/detail", updateTaskDetailById);
-// router.put("/:id/status", updateTaskStatusById);
-
-router.delete("/:id/", deleteTaskById);
+router.post("/", auth, createTask);
+router.put("/:id", auth, updateTaskById);
+router.delete("/:id/", auth, deleteTaskById);
 
 export default router;
