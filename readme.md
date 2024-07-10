@@ -104,18 +104,20 @@ The pipeline is defined in `deploy.yml`:
 
 ### Docker Image
 
-[Docker Hub Repo: https://hub.docker.com/r/akamart/lf-be-todo](https://hub.docker.com/r/akamart/lf-be-todo)
+[Docker Hub Repo: https://hub.docker.com/r/akamart/lf-be-todo-d1](https://hub.docker.com/r/akamart/lf-be-todo-d1)
 
 - Docker pull command:
 
 ```bash
-docker pull akamart/lf-be-todo
+docker pull akamart/lf-be-todo-d1
 ```
+
+- Make a .env file in your current directory using the provided .env.example template.
 
 - Run docker image:
 
 ```bash
-docker run -p 8000:8000 akamart/lf-be-todo
+docker run --env-file .env -p 8000:8000 akamart/lf-be-todo-d1
 ```
 
 ## Available Routes and Data
