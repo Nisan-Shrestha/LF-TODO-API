@@ -5,10 +5,13 @@ import { IUser } from "../interfaces/User";
 import { hash } from "bcrypt";
 
 import crypto from "crypto";
+import { permission } from "process";
+import { perms } from "../utils/permission";
 
 export function getUUID() {
   return crypto.randomUUID();
 }
+
 export async function getUserInfo(id: UUID) {
   try {
     const data = await UserModel.getUserInfo(id);
@@ -27,6 +30,22 @@ export async function getUserInfo(id: UUID) {
   }
 }
 
+export async function getAllUser() {
+  try {
+    const data = await UserModel.getAllUser();
+
+    if (!data) {
+      throw new Error("Could not read users");
+    }
+    return data;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log("UserService -> getUserInfo", e.message);
+      throw new Error(e.message);
+    }
+  }
+}
+
 export async function createuser(user: IUser) {
   try {
     const hashedPassword = await hash(user.password, 10);
@@ -35,6 +54,7 @@ export async function createuser(user: IUser) {
       name: user.name,
       email: user.email,
       password: hashedPassword,
+      permissions: perms.userPerms,
     };
     return await UserModel.createuser(newUser);
   } catch (e) {

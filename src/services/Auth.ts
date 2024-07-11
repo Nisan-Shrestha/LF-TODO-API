@@ -15,7 +15,7 @@ export async function login(data: Pick<IUser, "email" | "password">) {
 
   const isValidPassword = await bcrypt.compare(
     data.password,
-    existingUser.password,
+    existingUser.password
   );
 
   if (!isValidPassword) {
@@ -28,6 +28,7 @@ export async function login(data: Pick<IUser, "email" | "password">) {
     id: existingUser.id,
     name: existingUser.name,
     email: existingUser.email,
+    permissions: existingUser.permissions,
   };
 
   if (!config.jwt.secret) {

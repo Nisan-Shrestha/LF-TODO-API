@@ -63,6 +63,7 @@ export async function refresh(req: Request, res: Response) {
         id: data.id,
         name: data.name,
         email: data.email,
+        permissions: data.permissions,
       };
       const accessToken = sign(payload, config.jwt.secret!);
       const refreshToken = token[1];

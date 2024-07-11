@@ -26,6 +26,28 @@ export async function getUserInfo(id: UUID) {
   }
 }
 
+export async function getAllUser() {
+  try {
+    const parsed_data: IUser[] = await readUserData();
+    if (parsed_data) {
+      const users = parsed_data.map((user) => {
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        };
+      });
+      return users;
+    }
+    return null;
+  } catch (e) {
+    if (e instanceof Error) {
+      console.log("Error retrieving Users infos");
+      throw new Error(e.message);
+    }
+  }
+}
+
 export async function createuser(user: IUser) {
   try {
     const parsed_data: IUser[] = await readUserData();

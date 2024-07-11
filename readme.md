@@ -1,20 +1,21 @@
-# LF-backend-todo Assignment (Day 2)
+# LF-backend-todo Assignment (Day 3)
 
 This project is a backend service built using Node.js, Express, and TypeScript. It includes JWT authentication and CRUD operations for managing users and tasks.
 
-Day 2 tasks consists of updating the apis to include login, authentication middleware using jwt and updates to existing routes.
+Day 3 tasks consists of updating the apis to include login, authentication middleware using jwt and updates to existing routes.
 
-## Day2 tasks
+## Day3 tasks
 
-1. Add a create user route which takes name, email and password.
-2. Add routes for user login which should take in email and password and return access and refresh tokens
-3. Create a middleware for authentication using jwt tokens
-4. Create a refresh route for refreshing access tokens using refresh tokens
+1. Add a default super admin user in the users array. Create CRUD routes for users and only the super admin user should have access to those routes.
+2. Each new created user should be able to do CRUD operations on their to do items only.
+3. Each of the response must have a proper HTTP status code
+4. Add error handlers and appropriate errors for all cases
+5. Add loggers appropriately for all routes
 
 ## Table of Contents
 
-- [LF-backend-todo Assignment (Day 2)](#lf-backend-todo-assignment-day-2)
-  - [Day2 tasks](#day2-tasks)
+- [LF-backend-todo Assignment (Day 3)](#lf-backend-todo-assignment-day-3)
+  - [Day3 tasks](#day3-tasks)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
@@ -26,9 +27,11 @@ Day 2 tasks consists of updating the apis to include login, authentication middl
   - [Deployment](#deployment)
     - [CI/CD Pipeline](#cicd-pipeline)
     - [Docker Image](#docker-image)
+  - [Defualt Admin](#defualt-admin)
   - [Available Routes and Data](#available-routes-and-data)
     - [User Routes](#user-routes)
-      - [Get User Info](#get-user-info)
+      - [Get User Info by ID](#get-user-info-by-id)
+      - [Get All User Info](#get-all-user-info)
       - [Create User](#create-user)
       - [Update User (NOT authenticated)](#update-user-not-authenticated)
       - [Delete User (NOT authenticated)](#delete-user-not-authenticated)
@@ -133,18 +136,32 @@ docker pull akamart/lf-be-todo-d2
 docker run --env-file .env -p 8000:8000 akamart/lf-be-todo-d2
 ```
 
+## Defualt Admin
+
+A defualt admin with email: `admin@gmail.com` and pw: `Admin123` exists for now.
+Only Admin has access to User Routes.
+
 ## Available Routes and Data
 
 ### User Routes
 
-#### Get User Info
+ALl user routes are authenicated and authorised only to the Default Admin
 
-- **Route:** `GET /users`
+#### Get User Info by ID
+
+- **Route:** `GET /users/:id`
 - **Handler Function:** `getUserInfo`
 - **Description:** Retrieves user information based on a provided ID.
-- **Query Parameters:**
+- **Request Parameters:**
   - `id`: The ID of the user to retrieve.
 - **Response Data:** JSON containing user information.
+
+#### Get All User Info
+
+- **Route:** `GET /users`
+- **Handler Function:** `getAllUser`
+- **Description:** Retrieves user information based on a provided ID.
+- **Response Data:** Array of JSON containing all user information.
 
 #### Create User
 

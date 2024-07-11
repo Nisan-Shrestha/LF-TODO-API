@@ -6,19 +6,19 @@ import e from "express";
 
 const pathToTasks = path.join(__dirname, "../data/tasks.json");
 
-export async function getAllTasks(userId: UUID): Promise<ITask[]> {
+export async function getAllTasks(userID: UUID): Promise<ITask[]> {
   const tasks = await readTasksFromFile();
-  return tasks.filter(({ userID: uid }) => uid === userId);
+  return tasks.filter(({ userID: uid }) => uid === userID);
 }
 
-export async function getTaskById(taskId:UUID, userId: UUID) {
+export async function getTaskById(taskID:UUID, userID: UUID) {
   try {
     const tasks = await readTasksFromFile();
     const data = tasks.find(
-      ({ userID: uid, id: tid }) => uid === userId && tid === taskId
+      ({ userID: uid, id: tid }) => uid === userID && tid === taskID
     );
     if (!data) {
-      throw new Error(`Task with id:${taskId} not found`);
+      throw new Error(`Task with id:${taskID} not found`);
     }
     return data;
   } catch (err) {
