@@ -1,4 +1,8 @@
 import config from "../config";
+import { BadRequest } from "../error/BadRequest";
+import { Internal } from "../error/Internal";
+import { NotFound } from "../error/NotFound";
+import { Unauthorized } from "../error/Unauthorized";
 import { IUser } from "../interfaces/User";
 import { getUserByEmail } from "./User";
 import bcrypt from "bcrypt";
@@ -8,20 +12,14 @@ export async function login(data: Pick<IUser, "email" | "password">) {
   const existingUser = await getUserByEmail(data.email);
 
   if (!existingUser) {
-    return {
-      error: "Invalid email address",
-    };
+    throw new NotFound("User does not exist with given email");
   }
-
   const isValidPassword = await bcrypt.compare(
     data.password,
     existingUser.password
   );
-
   if (!isValidPassword) {
-    return {
-      error: "Invalid password",
-    };
+    throw new Unauthorized("Invalid password");
   }
 
   const payload = {
@@ -32,9 +30,7 @@ export async function login(data: Pick<IUser, "email" | "password">) {
   };
 
   if (!config.jwt.secret) {
-    return {
-      error: "Secret not Setup.",
-    };
+    throw new Internal("Secret not Setup.");
   }
 
   const accessToken = sign(payload, config.jwt.secret, {

@@ -8,6 +8,8 @@ import {
   getAllUser,
 } from "../controller/User";
 import { authenticate, authorize } from "../middleware/auth";
+import { validateReqBody, validateReqParams } from "../middleware/validator";
+import { getUserByIDQuerySchema } from "../schema/user";
 
 const router = express();
 

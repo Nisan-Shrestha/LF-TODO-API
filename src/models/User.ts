@@ -2,6 +2,9 @@ import { IUser } from "../interfaces/User";
 import { UUID } from "crypto";
 import path from "path";
 import fs from "fs/promises";
+import { BadRequest } from "../error/BadRequest";
+import { Conflict } from "../error/Conflict";
+import { Internal } from "../error/Internal";
 
 const pathToUserData = path.join(__dirname, "../data/users.json");
 
@@ -21,7 +24,7 @@ export async function getUserInfo(id: UUID) {
   } catch (e) {
     if (e instanceof Error) {
       console.log("Error retrieving User info", id);
-      throw new Error(e.message);
+      throw new Internal(e.message);
     }
   }
 }
@@ -53,7 +56,7 @@ export async function createuser(user: IUser) {
     const parsed_data: IUser[] = await readUserData();
     const userExists = parsed_data.find(({ email }) => email === user.email);
     if (userExists) {
-      throw new Error(`User with ${user.email} already exists`);
+      throw new Conflict(`User with ${user.email} already exists`);
     }
     parsed_data.push(user);
     await writeUserData(parsed_data);
