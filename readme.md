@@ -48,10 +48,10 @@ Day 3 tasks consists of updating the apis to include login, authentication middl
 
 ## Installation
 
-1. Clone the repository with day2 branch:
+1. Clone the repository with day3 branch:
 
 ```bash
-git clone -b day2 https://github.com/Nisan-Shrestha/LF-backend-todo.git
+git clone -b day3 https://github.com/Nisan-Shrestha/LF-backend-todo.git
 cd LF-backend-todo
 ```
 
@@ -114,18 +114,18 @@ The project includes a GitHub Actions workflow for continuous integration and de
 
 The pipeline is defined in `deploy.yml`:
 
-- Triggers on push or pull request to the `day2` branch. (Also other day specific branches)
+- Triggers on push or pull request to the `day3` branch. (Also other day specific branches)
 - Logs in to Docker Hub.
 - Builds and pushes the Docker image to Docker Hub.
 
 ### Docker Image
 
-[Docker Hub Repo: https://hub.docker.com/r/akamart/lf-be-todo-d2](https://hub.docker.com/r/akamart/lf-be-todo-d2)
+[Docker Hub Repo: https://hub.docker.com/r/akamart/lf-be-todo-d3](https://hub.docker.com/r/akamart/lf-be-todo-d3)
 
 - Docker pull command:
 
 ```bash
-docker pull akamart/lf-be-todo-d2
+docker pull akamart/lf-be-todo-d3
 ```
 
 - Make a .env file in your current directory using the provided .env.example template.
@@ -133,7 +133,7 @@ docker pull akamart/lf-be-todo-d2
 - Run docker image:
 
 ```bash
-docker run --env-file .env -p 8000:8000 akamart/lf-be-todo-d2
+docker run --env-file .env -p 8000:8000 akamart/lf-be-todo-d3
 ```
 
 ## Defualt Admin
