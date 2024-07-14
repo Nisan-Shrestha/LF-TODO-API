@@ -8,24 +8,23 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
   const { authorization } = req.headers;
 
   if (!authorization) {
-    next(new Error("Unauthenticated"));
+    throw new Error("Unauthenticated");
     return;
   }
 
   const token = authorization.split(" ");
 
   if (token.length !== 2 || token[0] !== "Bearer") {
-    next(new Error("Unauthenticated"));
+    throw new Error("Unauthenticated");
     return;
   }
 
   verify(token[1], config.jwt.secret!, (error, data) => {
     if (error) {
-      next(new Error(error.message));
+      throw new Error(error.message);
     }
 
     req.user = data as IUser;
-    next();
   });
 }
 

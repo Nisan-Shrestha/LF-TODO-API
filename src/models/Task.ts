@@ -11,7 +11,7 @@ export async function getAllTasks(userID: UUID): Promise<ITask[]> {
   return tasks.filter(({ userID: uid }) => uid === userID);
 }
 
-export async function getTaskById(taskID:UUID, userID: UUID) {
+export async function getTaskById(taskID: UUID, userID: UUID) {
   try {
     const tasks = await readTasksFromFile();
     const data = tasks.find(

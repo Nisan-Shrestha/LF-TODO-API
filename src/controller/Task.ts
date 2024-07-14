@@ -1,52 +1,61 @@
 import { NotFound } from "./../error/NotFound";
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import * as taskService from "../services/Task";
 import { UUID } from "node:crypto";
 import { IUser } from "../interfaces/User";
 import crypto from "crypto";
 import loggerWithNameSpace from "../utils/logger";
 import { BadRequest } from "../error/BadRequest";
-
+import { Request } from "../interfaces/auth";
+import { Internal } from "../error/Internal";
 const logger = loggerWithNameSpace("TaskController");
 
-export async function getAllTasks(req: any, res: Response, next: NextFunction) {
-  const user = req.user;
+export async function getAllTasks(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   logger.info("Getting all tasks");
-  try {
-    const data = await taskService.getAllTasks(user.id);
-    if (!data) {
-      logger.error("Unable to find tasks");
-      next(new NotFound("Unable to find tasks"));
-      return;
-    }
-    if (data.length == 0) {
-      logger.warn("Tasks empty");
-      res.status(200).json([...data]);
-      return;
-    }
-    logger.info("Tasks found");
+  const user = req.user;
+  if (!user) {
+    logger.info("Getting all tasks");
+    throw new Internal("User not forwarded by authenticator found");
+  }
+  const data = await taskService.getAllTasks(user.id);
+  if (!data) {
+    logger.error("Unable to find tasks");
+    next(new NotFound("Unable to find tasks"));
+    return;
+  }
+  if (data.length == 0) {
+    logger.warn("Tasks empty");
     res.status(200).json([...data]);
     return;
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: getUserInfo", e.message as string);
-      next(new Error(e.message));
-    }
   }
+  logger.info("Tasks found");
+  res.status(200).json([...data]);
+  return;
 }
 
-export async function getTaskById(req: any, res: Response, next: NextFunction) {
+export async function getTaskById(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const user = req.user;
-  const { id: tid } = req.params;
-  logger.info(`Getting task with id: ${tid}`);
-
-  const data = await taskService.getTaskById(tid, user.id);
+  const { id } = req.params;
+  logger.info(`Getting task with id: ${id}`);
+  if (!user) {
+    logger.info("Getting all tasks");
+    throw new Internal("User not forwarded by authenticator found");
+  }
   try {
+    const data = await taskService.getTaskById(id as UUID, user.id);
     if (!data) {
-      logger.warn(`Task with id: ${tid} not found in current user`);
-      next(new NotFound(`Task with id: ${tid} not found in current user`));
+      logger.warn(`Task with id: ${id} not found in current user`);
+      next(new NotFound(`Task with id: ${id} not found in current user`));
     } else {
-      logger.info(`Task with id: ${tid} found`);
+      logger.info(`Task with id: ${id} found`);
       res.status(200).json(data);
     }
   } catch (err) {
@@ -57,18 +66,19 @@ export async function getTaskById(req: any, res: Response, next: NextFunction) {
   }
 }
 
-export async function createTask(req: any, res: Response, next: NextFunction) {
-  const { body } = req;
-  if (!req.body.detail) {
-    logger.error("Task detail missing");
-    next(new BadRequest("Task detail is required"));
-  }
-
-  const { detail } = body;
+export async function createTask(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { detail } = req.body;
   const { user } = req;
-
+  if (!user) {
+    logger.info("Getting all tasks");
+    throw new Internal("User not forwarded by authenticator found");
+  }
   try {
-    const data = await taskService.createTask(detail as string, user.id);
+    const data = await taskService.createTask(detail, user.id);
 
     if (data.data) {
       logger.info("Task created successfully");
@@ -87,26 +97,30 @@ export async function createTask(req: any, res: Response, next: NextFunction) {
 }
 
 export async function updateTaskById(
-  req: any,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
   const { id } = req.params;
-  const {
-    user: { id: userID },
-  } = req;
+
+  const { user } = req;
+  if (!user) {
+    logger.info("Getting all tasks");
+    throw new Internal("User not forwarded by authenticator found");
+  }
+  const userID = user.id;
   if (!id) {
     logger.error("Id is required");
     next(new BadRequest("Id is required"));
     return;
   }
-  const { query } = req;
+  const { update } = req.query;
   const { detail, status } = req.body;
   logger.info(`Updating task with id: ${id}`);
   try {
     const result = await taskService.updateTaskById(
       id as UUID,
-      String(query.update),
+      update as string,
       userID,
       detail,
       status
@@ -129,12 +143,16 @@ export async function updateTaskById(
 }
 
 export async function deleteTaskById(
-  req: any,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
   const { id } = req.params;
   const { user } = req;
+  if (!user) {
+    logger.info("Getting all tasks");
+    throw new Internal("User not forwarded by authenticator found");
+  }
   if (!id) {
     logger.error("Id is needed to delete task");
     next(new BadRequest("Id is needed"));
@@ -142,7 +160,7 @@ export async function deleteTaskById(
   }
   logger.info(`Deleting task with id: ${id}`);
   try {
-    const result = await taskService.deleteTaskById(id, user.id);
+    const result = await taskService.deleteTaskById(id as UUID, user.id);
     if (result.data) {
       logger.info(`Task with id: ${id} deleted successfully`);
       res.status(200).json(result);

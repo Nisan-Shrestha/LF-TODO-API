@@ -48,7 +48,7 @@ export async function createTask(detail: string, uid: UUID) {
 
 export async function updateTaskById(
   tid: UUID,
-  query: string,
+  update: string,
   uid: UUID,
   detail?: string,
   status?: string
@@ -56,12 +56,12 @@ export async function updateTaskById(
   logger.info(`Updating task with ID: ${tid} for user with ID: ${uid}`);
   let data: ITask | null = null;
   if (
-    query === "status" &&
+    update === "status" &&
     status &&
     (status === "done" || status == "pending")
   ) {
     data = await taskModel.updateTaskStatus(tid, status, uid);
-  } else if (query === "detail" && typeof detail === "string") {
+  } else if (update === "detail" && typeof detail === "string") {
     data = await taskModel.updateTask(tid, detail, uid);
   }
   if (data) {

@@ -37,3 +37,25 @@ export function validateReqParams(schema: Schema) {
     next();
   };
 }
+export function validateReqHeader(schema: Schema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.headers);
+
+    if (error) {
+      next(new BadRequest(error.message));
+    }
+    req.headers = value;
+    next();
+  };
+}
+export function validateAuthenticatedUser(schema: Schema) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const { error, value } = schema.validate(req.headers);
+
+    if (error) {
+      next(new BadRequest(error.message));
+    }
+    req.headers = value;
+    next();
+  };
+}
