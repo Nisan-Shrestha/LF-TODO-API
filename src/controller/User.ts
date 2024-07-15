@@ -20,25 +20,18 @@ export async function getUserInfo(
 
   if (!id) {
     logger.error("ID not found in getUserInfo");
-    next(new BadRequest("ID is required as query param"));
+    throw new BadRequest("ID is required as query param");
     return;
   }
 
-  try {
-    const service_response = await UserService.getUserInfo(id as UUID);
-    if (!service_response) {
-      logger.error("User not found in getUserInfo");
-      next(new NotFound("Could not find user with given id"));
-      return;
-    }
-    logger.info("200 Response sent from getUserInfo");
-    res.status(HttpStatusCodes.ACCEPTED).json(service_response);
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: getUserInfo", e.message as string);
-      next(e);
-    }
+  const service_response = await UserService.getUserInfo(id as UUID);
+  if (!service_response) {
+    logger.error("User not found in getUserInfo");
+    throw new NotFound("Could not find user with given id");
+    return;
   }
+  logger.info("200 Response sent from getUserInfo");
+  res.status(HttpStatusCodes.ACCEPTED).json(service_response);
 }
 
 export async function getAllUser(
@@ -48,21 +41,13 @@ export async function getAllUser(
 ) {
   logger.info("Called getAllUser");
 
-  try {
-    const service_response = await UserService.getAllUser();
-    if (!service_response) {
-      logger.warn("User not found in getAllUser");
-      next(new NotFound("Could not find users"));
-      return;
-    }
-    logger.info("200 Response sent from getAllUser");
-    res.status(HttpStatusCodes.ACCEPTED).json(service_response);
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: getAllUser", e.message);
-      next(new Error(e.message));
-    }
+  const service_response = await UserService.getAllUser();
+  if (!service_response) {
+    logger.warn("User not found in getAllUser");
+    throw new NotFound("Could not find users");
   }
+  logger.info("200 Response sent from getAllUser");
+  res.status(HttpStatusCodes.ACCEPTED).json(service_response);
 }
 
 export async function createUser(
@@ -76,22 +61,15 @@ export async function createUser(
 
   if (!email || !password || !name) {
     logger.error("BAD request in createUser");
-    next(new BadRequest("At least one of email, password, name is missing"));
-    return;
+    throw new BadRequest("At least one of email, password, name is missing");
   }
-  try {
-    const data = await UserService.createuser(body);
-    if (data) {
-      logger.info("User Created");
-      next(new Conflict("User already exists"));
-    }
-    throw Error("Could not create user");
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: createUser", e.message);
-      next(new Error(e.message));
-    }
+
+  const data = await UserService.createuser(body);
+  if (data) {
+    logger.info("User Created");
+    throw new Conflict("User already exists");
   }
+  throw Error("Could not create user");
 }
 
 export async function updateUser(
@@ -105,22 +83,15 @@ export async function updateUser(
 
   if (!id) {
     logger.error("ID not present: updateUser");
-    new BadRequest("ID is required as query param");
-    return;
+    throw new BadRequest("ID is required as query param");
   }
-  try {
-    const data = await UserService.updateUser(id as UUID, body);
-    if (data) {
-      res.status(HttpStatusCodes.ACCEPTED).json(data);
-    }
 
-    throw Error("Could not update User");
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: updateUser", e.message);
-      next(new Error(e.message));
-    }
+  const data = await UserService.updateUser(id as UUID, body);
+  if (data) {
+    res.status(HttpStatusCodes.ACCEPTED).json(data);
   }
+
+  throw Error("Could not update User");
 }
 
 export async function deleteUser(
@@ -132,16 +103,9 @@ export async function deleteUser(
   const { id } = req.query;
   if (!id) {
     logger.error("ID missing in deleteuser");
-    next(new BadRequest("ID is required as query param"));
-    return;
+    throw new BadRequest("ID is required as query param");
   }
-  try {
-    const service_response = await UserService.deleteUser(id as UUID);
-    res.status(HttpStatusCodes.ACCEPTED).json(service_response);
-  } catch (e) {
-    if (e instanceof Error) {
-      logger.error("Internal Error: deleteUser", e.message);
-      next(new Error(e.message));
-    }
-  }
+
+  const service_response = await UserService.deleteUser(id as UUID);
+  res.status(HttpStatusCodes.ACCEPTED).json(service_response);
 }
