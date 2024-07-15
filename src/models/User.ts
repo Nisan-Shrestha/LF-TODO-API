@@ -55,12 +55,18 @@ export async function createUser(user: IUser) {
   try {
     const parsed_data: IUser[] = await readUserData();
     const userExists = getUserByEmail(user.email);
+    console.log("user:", user);
+    console.log("user:", user);
     if (userExists) {
       throw new Conflict(`User with email ${user.email} already exists`);
     }
     parsed_data.push(user);
     await writeUserData(parsed_data);
-    return user;
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
   } catch (e) {
     if (e instanceof Error) {
       console.log("Model -> createUser: ", e.message);
@@ -95,8 +101,11 @@ export async function deleteUser(id: UUID) {
     const filtered_users = parsed_data.filter(
       ({ id: userID }) => userID !== id
     );
-
+    if (parsed_data.length === filtered_users.length) {
+      return false;
+    }
     await writeUserData(filtered_users);
+    return true;
   } catch (e) {
     if (e instanceof Error) {
       console.log("Model -> deleteUser: ", id);

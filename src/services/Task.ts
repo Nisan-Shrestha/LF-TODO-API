@@ -18,7 +18,7 @@ export async function getTaskById(tid: UUID, uid: UUID) {
   const data = taskModel.getTaskById(tid, uid);
   if (!data) {
     logger.error(`Task with ID: ${tid} not found for user with ID: ${uid}`);
-    throw new NotFound(`Task with id:${tid} not found for current user`);
+    throw new NotFound(`Task with id: ${tid} not found for current user`);
   }
   return data;
 }
@@ -65,11 +65,26 @@ export async function updateTaskById(
     data = await taskModel.updateTask(tid, detail, uid);
   }
   if (data) {
-    logger.info(`Task with ID: ${tid} updated successfully`);
+    logger.info(`Task with ID: ${tid} updated.`);
+    if (detail && data.detail != detail) {
+      logger.warn(
+        `Task detail incorrectly updated or failed to update: sent: ${detail}, set: ${data.detail}`
+      );
+    }
+    if (status && data.status != TaskStatus[status]) {
+      logger.warn(
+        `Task status incorrectly updated or failed to update:  sent: ${status}, set: ${TaskStatus[status]}`
+      );
+    }
     return {
-      message: "Update Sucessfull",
+      message: "Task updated successfully",
       data,
     };
+  } else if (data === null) {
+    logger.error(`Task with id: ${tid} not found for current user`);
+
+    logger.error("Failed to delete task");
+    throw new NotFound(`Task with id: ${tid} not found for current user`);
   } else {
     logger.error("Failed to update task");
     throw new Internal("Failed to update");
@@ -91,6 +106,11 @@ export async function deleteTaskById(
       message: "Successfully deleted",
       data,
     };
+  } else if (data === null) {
+    logger.error(`Task with id: ${tid} not found for current user`);
+
+    logger.error("Failed to delete task");
+    throw new NotFound(`Task with id: ${tid} not found for current user`);
   } else {
     logger.error("Failed to delete task");
     throw new Internal("Failed to delete");

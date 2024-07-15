@@ -1,14 +1,11 @@
-import { Internal } from "./../error/Internal";
-import bcrypt from "bcrypt";
-import * as UserModel from "../models/User";
-import { UUID } from "crypto";
-import { IUser } from "../interfaces/User";
 import { hash } from "bcrypt";
-import crypto from "crypto";
-import { permission } from "process";
-import { perms } from "../utils/permission";
+import crypto, { UUID } from "crypto";
 import { NotFound } from "../error/NotFound";
+import { IUser } from "../interfaces/User";
+import * as UserModel from "../models/User";
 import loggerWithNameSpace from "../utils/logger";
+import { perms } from "../utils/permission";
+import { Internal } from "./../error/Internal";
 
 const logger = loggerWithNameSpace("UserServices");
 
@@ -64,14 +61,21 @@ export async function updateUser(id: UUID, data: Partial<IUser>) {
   if (name) dataToUpdate.name = name;
   if (email) dataToUpdate.email = email;
   const updatedUser = await UserModel.updateUser(id, dataToUpdate);
+  if (!updatedUser) {
+    logger.error(`User with id: ${id} not found`);
+    throw new NotFound(`User with id: ${id} not found`);
+  }
   logger.info(`User updated: ${JSON.stringify(updatedUser)}`);
   return updatedUser;
 }
 
 export async function deleteUser(id: UUID) {
   logger.info(`Deleting user with id: ${id}`);
-  await UserModel.deleteUser(id);
-  logger.info(`User with id ${id} deleted successfully`);
+  let result = await UserModel.deleteUser(id);
+  if (!result) {
+    throw new NotFound(`User with id: ${id} not found`);
+  }
+  logger.info(`User with id: ${id} deleted successfully`);
   return {
     message: "User deleted Successfully",
   };
@@ -86,5 +90,5 @@ export async function getUserByEmail(email: string) {
   }
 
   logger.error(`User with email ${email} not found`);
-  throw new Error(`User with ${email} not found`);
+  throw new Error(`User with email ${email} not found`);
 }

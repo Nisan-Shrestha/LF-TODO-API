@@ -3,6 +3,7 @@ import { ITask, TaskStatus } from "../interfaces/Task";
 import fs from "fs/promises";
 import path from "node:path";
 import e from "express";
+import { NotFound } from "../error/NotFound";
 
 const pathToTasks = path.join(__dirname, "../data/tasks.json");
 
@@ -12,20 +13,15 @@ export async function getAllTasks(userID: UUID): Promise<ITask[]> {
 }
 
 export async function getTaskById(taskID: UUID, userID: UUID) {
-  try {
     const tasks = await readTasksFromFile();
     const data = tasks.find(
       ({ userID: uid, id: tid }) => uid === userID && tid === taskID
     );
     if (!data) {
-      throw new Error(`Task with id:${taskID} not found`);
+      throw new NotFound(`Task with id: ${taskID} not found`);
     }
     return data;
-  } catch (err) {
-    if (err instanceof Error) {
-      throw new Error(err.message);
-    }
-  }
+  
 }
 
 export async function createTask(task: ITask) {

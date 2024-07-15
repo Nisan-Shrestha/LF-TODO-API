@@ -79,7 +79,7 @@ describe("User Service Test Suite", () => {
         permissions: perms.userPerms,
       };
       userModelGetUserByEmailStub.returns(user);
-
+      userModelCreateUserStub.restore();
       await expect(
         createUser({
           id: "2" as UUID,
@@ -96,25 +96,19 @@ describe("User Service Test Suite", () => {
     it("Should create a new user when user does not exist", async () => {
       userModelGetUserByEmailStub.returns(undefined);
       bcryptHashStub.resolves("hashedPassword");
-      const userR = {
+      const stubbedUser = {
         id: "2" as UUID,
         name: "User 2",
         email: "user2@email.com",
         password: "hashedPassword",
         permissions: perms.userPerms,
       };
-      userModelCreateUserStub.returns({
-        id: "2" as UUID,
-        name: "User 2",
-        email: "user2@email.com",
-        password: "hashedPassword",
-        permissions: perms.userPerms,
-      });
+      userModelCreateUserStub.returns(stubbedUser);
 
       const user = await createUser({
         id: "2" as UUID,
         name: "User 2",
-        email: "user1@email.com",
+        email: "user2@email.com",
         password: "hashedPassword",
         permissions: perms.userPerms,
       } as IUser);
@@ -124,6 +118,134 @@ describe("User Service Test Suite", () => {
         name: "User 2",
         email: "user2@email.com",
       });
+    });
+  });
+
+  describe("getAllUser", () => {
+    let userModelGetAllUserStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      userModelGetAllUserStub = sinon.stub(UserModel, "getAllUser");
+    });
+
+    afterEach(() => {
+      userModelGetAllUserStub.restore();
+    });
+
+    it("Should return all users", async () => {
+      const users = [
+        { id: "1", name: "User 1", email: "user1@email.com" },
+        { id: "2", name: "User 2", email: "user2@email.com" },
+      ];
+      userModelGetAllUserStub.returns(users);
+
+      const res = await getAllUser();
+
+      expect(res).toStrictEqual(users);
+    });
+
+    it("Should return an empty array when no users are found", async () => {
+      userModelGetAllUserStub.returns([]);
+
+      const res = await getAllUser();
+
+      expect(res).toStrictEqual([]);
+    });
+  });
+
+  describe("updateUser", () => {
+    let userModelUpdateUserStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      userModelUpdateUserStub = sinon.stub(UserModel, "updateUser");
+    });
+
+    afterEach(() => {
+      userModelUpdateUserStub.restore();
+    });
+
+    it("Should update user data", async () => {
+      const user = {
+        id: "1",
+        name: "Updated User",
+        email: "updateduser@email.com",
+      };
+      userModelUpdateUserStub.returns(user);
+
+      const res = await updateUser("1" as UUID, { name: "Updated User" });
+
+      expect(res).toStrictEqual(user);
+    });
+
+    it("Should throw an error when user is not found", async () => {
+      userModelUpdateUserStub.returns(null);
+
+      await expect(() =>
+        updateUser("100" as UUID, { name: "Updated User" })
+      ).rejects.toThrow(new Error("User with id: 100 not found"));
+    });
+  });
+
+  describe("deleteUser", () => {
+    let userModelDeleteUserStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      userModelDeleteUserStub = sinon.stub(UserModel, "deleteUser");
+    });
+
+    afterEach(() => {
+      userModelDeleteUserStub.restore();
+    });
+
+    it("Should delete user when user is found", async () => {
+      userModelDeleteUserStub.returns(true);
+
+      const res = await deleteUser("1" as UUID);
+
+      expect(res).toStrictEqual({ message: "User deleted Successfully" });
+    });
+
+    it("Should throw an error when user is not found", async () => {
+      userModelDeleteUserStub.returns(false);
+
+      await expect(() => deleteUser("100" as UUID)).rejects.toThrow(
+        new Error("User with id: 100 not found")
+      );
+    });
+  });
+
+  describe("getUserByEmail", () => {
+    let userModelGetUserByEmailStub: sinon.SinonStub;
+
+    beforeEach(() => {
+      userModelGetUserByEmailStub = sinon.stub(UserModel, "getUserByEmail");
+    });
+
+    afterEach(() => {
+      userModelGetUserByEmailStub.restore();
+    });
+
+    it("Should return user data when email is found", async () => {
+      const stubbedUser = {
+        id: "2" as UUID,
+        name: "User 2",
+        email: "user2@email.com",
+        password: "hashedPassword",
+        permissions: perms.userPerms,
+      };
+      userModelGetUserByEmailStub.returns(stubbedUser);
+
+      const res = await getUserByEmail("user1@email.com");
+
+      expect(res).toStrictEqual(stubbedUser);
+    });
+
+    it("Should throw an error when email is not found", async () => {
+      userModelGetUserByEmailStub.returns(undefined);
+
+      await expect(() => getUserByEmail("notfound@email.com")).rejects.toThrow(
+        new Error("User with email notfound@email.com not found")
+      );
     });
   });
 });
