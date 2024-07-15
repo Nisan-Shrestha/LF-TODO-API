@@ -51,12 +51,12 @@ export async function getAllUser() {
   }
 }
 
-export async function createuser(user: IUser) {
+export async function createUser(user: IUser) {
   try {
     const parsed_data: IUser[] = await readUserData();
-    const userExists = parsed_data.find(({ email }) => email === user.email);
+    const userExists = getUserByEmail(user.email);
     if (userExists) {
-      throw new Conflict(`User with ${user.email} already exists`);
+      throw new Conflict(`User with email ${user.email} already exists`);
     }
     parsed_data.push(user);
     await writeUserData(parsed_data);

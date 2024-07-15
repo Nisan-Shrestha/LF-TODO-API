@@ -17,8 +17,8 @@ export async function getUserInfo(id: UUID) {
   const data = await UserModel.getUserInfo(id);
 
   if (!data) {
-    logger.error(`User with id ${id} not found`);
-    throw new NotFound(`User with ${id} not found`);
+    logger.error(`User with id: ${id} not found`);
+    throw new NotFound(`User with id: ${id} not found`);
   }
 
   logger.info(`User info retrieved: ${JSON.stringify(data)}`);
@@ -38,7 +38,7 @@ export async function getAllUser() {
   return data;
 }
 
-export async function createuser(user: IUser) {
+export async function createUser(user: IUser) {
   logger.info(`Creating user: ${JSON.stringify(user)}`);
   const hashedPassword = await hash(user.password, 10);
   const newUser = {
@@ -48,9 +48,13 @@ export async function createuser(user: IUser) {
     password: hashedPassword,
     permissions: perms.userPerms,
   };
-  const createdUser = await UserModel.createuser(newUser);
+  const createdUser = await UserModel.createUser(newUser);
   logger.info(`User created: ${JSON.stringify(createdUser)}`);
-  return createdUser;
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  };
 }
 
 export async function updateUser(id: UUID, data: Partial<IUser>) {

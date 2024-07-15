@@ -64,10 +64,10 @@ export async function createUser(
     throw new BadRequest("At least one of email, password, name is missing");
   }
 
-  const data = await UserService.createuser(body);
+  const data = await UserService.createUser(body);
   if (data) {
     logger.info("User Created");
-    throw new Conflict("User already exists");
+    res.status(HttpStatusCodes.ACCEPTED).json(data);
   }
   throw Error("Could not create user");
 }
