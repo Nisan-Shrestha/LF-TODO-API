@@ -62,10 +62,11 @@ export async function createuser(user: IUser) {
     await writeUserData(parsed_data);
     return user;
   } catch (e) {
-    if (e instanceof Error) {
       console.log("Model -> createUser: ", e.message);
-      throw new Error(e.message);
-    }
+    throw e as Error;
+    // if (e instanceof Error) {
+    //   throw new Error(e.message);
+    // }
   }
 }
 
