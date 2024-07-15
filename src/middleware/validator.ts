@@ -10,7 +10,6 @@ export function validateReqQuery(schema: Schema) {
       next(new BadRequest(error.message));
     }
     req.query = value;
-    next();
   };
 }
 
@@ -22,7 +21,6 @@ export function validateReqBody(schema: Schema) {
       next(new BadRequest(error.message));
     }
     req.body = value;
-    next();
   };
 }
 
@@ -34,7 +32,6 @@ export function validateReqParams(schema: Schema) {
       next(new BadRequest(error.message));
     }
     req.params = value;
-    next();
   };
 }
 export function validateReqHeader(schema: Schema) {
@@ -45,7 +42,6 @@ export function validateReqHeader(schema: Schema) {
       next(new BadRequest(error.message));
     }
     req.headers = value;
-    next();
   };
 }
 export function validateAuthenticatedUser(schema: Schema) {
@@ -56,6 +52,5 @@ export function validateAuthenticatedUser(schema: Schema) {
       next(new BadRequest(error.message));
     }
     req.headers = value;
-    next();
   };
 }

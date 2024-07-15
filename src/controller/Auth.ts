@@ -20,7 +20,7 @@ export async function login(
   const data = req.body;
 
   const response = await AuthService.login(data);
-
+  // return;
   if (response) {
     logger.info("Login Successfull");
     res.status(HttpStatusCodes.ACCEPTED).json({
@@ -30,8 +30,8 @@ export async function login(
     return;
   }
 
-  logger.error("Login Failed:");
-  throw new Unauthorized("Login Failed");
+  // logger.error("Login Failed:");
+  // throw new Unauthorized("Login Failed");
 }
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {
@@ -53,7 +53,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction) {
   verify(token[1], config.jwt.secret!, (error, data) => {
     if (error) {
       logger.error("Token verification error: ", error.message);
-      throw (new Unauthorized(error.message));
+      throw new Unauthorized(error.message);
     }
 
     if (typeof data !== "string" && data) {

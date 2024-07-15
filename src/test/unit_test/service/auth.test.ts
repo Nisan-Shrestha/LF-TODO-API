@@ -51,7 +51,7 @@ describe("Auth Service Test Suite", () => {
 
       await expect(() =>
         login({ email: "user1@email.com", password: "wrongpassword" })
-      ).rejects.toThrow(new Unauthorized("Invalid password"));
+      ).rejects.toThrow(new Unauthorized("Invalid password received"));
     });
 
     it("Should throw Internal error when JWT secret is not set", async () => {

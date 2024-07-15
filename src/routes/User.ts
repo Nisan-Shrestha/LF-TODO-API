@@ -19,41 +19,53 @@ import {
   updateUserByIDBodySchema,
   updateUserByIDQuerySchema as DeleteUserByIDQuerySchema,
 } from "../schema/user";
+import { requestHandler } from "../utils/reqHandler";
 
 const router = express();
 
 router.get(
   "/:id",
-  authenticate,
-  authorize("users.get"),
-  validateReqParams(getUserByIDQuerySchema),
-  getUserInfo
+  requestHandler([
+    authenticate,
+    authorize("users.get"),
+    validateReqParams(getUserByIDQuerySchema),
+    getUserInfo,
+  ])
 );
-router.get("/", authenticate, authorize("users.get"), getAllUser);
+router.get(
+  "/",
+  requestHandler([authenticate, authorize("users.get"), getAllUser])
+);
 router.post(
   "/",
-  authenticate,
-  authorize("users.post"),
-  validateReqBody(createUserSchema),
-  createUser
+  requestHandler([
+    authenticate,
+    authorize("users.post"),
+    validateReqBody(createUserSchema),
+    createUser,
+  ])
 );
 
 // // TODO: authenticate routes properly (Out of scope of day2)
 router.put(
   "/",
-  authenticate,
-  authorize("users.put"),
-  validateReqQuery(DeleteUserByIDQuerySchema),
-  validateReqBody(updateUserByIDBodySchema),
-  updateUser
+  requestHandler([
+    authenticate,
+    authorize("users.put"),
+    validateReqQuery(DeleteUserByIDQuerySchema),
+    validateReqBody(updateUserByIDBodySchema),
+    updateUser,
+  ])
 );
 
 router.delete(
   "/",
-  authenticate,
-  authorize("users.delete"),
-  validateReqQuery(DeleteUserByIDQuerySchema),
-  deleteUser
+  requestHandler([
+    authenticate,
+    authorize("users.delete"),
+    validateReqQuery(DeleteUserByIDQuerySchema),
+    deleteUser,
+  ])
 );
 // router.put("/", authenticate, authorize("users.putSelf"), updateUserSelf);
 // router.delete("/", authenticate, authorize("users.deleteSelf"), deleteUserSelf);

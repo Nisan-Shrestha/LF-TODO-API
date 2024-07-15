@@ -27,14 +27,17 @@ const router = express();
 router.get("/", requestHandler([authenticate, getAllTasks]));
 router.get(
   "/:id",
-  authenticate,
-  validateReqParams(getTaskByIDSchema),
-  getTaskById
+  requestHandler([
+    authenticate,
+    validateReqParams(getTaskByIDSchema),
+    getTaskById,
+  ])
 );
 
-router.post("/", authenticate, validateReqBody(createTaskSchema), createTask);
-import { NextFunction, Response } from "express";
-import { Request } from "../interfaces/auth";
+router.post(
+  "/",
+  requestHandler([authenticate, validateReqBody(createTaskSchema), createTask])
+);
 
 router.put(
   "/:id",
@@ -48,9 +51,11 @@ router.put(
 );
 router.delete(
   "/:id/",
-  authenticate,
-  validateReqParams(deleteTaskByIDSchema),
-  deleteTaskById
+  requestHandler([
+    authenticate,
+    validateReqParams(deleteTaskByIDSchema),
+    deleteTaskById,
+  ])
 );
 
 export default router;
