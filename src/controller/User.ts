@@ -67,7 +67,7 @@ export async function createUser(
   const data = await UserService.createuser(body);
   if (data) {
     logger.info("User Created");
-    throw new Conflict("User already exists");
+    res.status(HttpStatusCodes.ACCEPTED).json(data);
   }
   throw Error("Could not create user");
 }
