@@ -7,3 +7,9 @@ export interface IUser {
   password: string;
   permissions: string[];
 }
+
+export interface GetUserQuery {
+  q?: string;
+  page?: number;
+  size?: number;
+}
