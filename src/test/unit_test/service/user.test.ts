@@ -11,7 +11,7 @@ import sinon from "sinon";
 
 import * as UserModel from "../../../models/User";
 import { permission } from "process";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import { create } from "domain";
 import { IUser } from "../../../interfaces/User";
 import { UUID } from "crypto";
@@ -53,24 +53,24 @@ describe("User Service Test Suite", () => {
   });
 
   describe("createUser", () => {
-    let bcryptHashStub: sinon.SinonStub;
+    let bcryptjsHashStub: sinon.SinonStub;
     let userModelCreateUserStub: sinon.SinonStub;
     let userModelGetUserByEmailStub: sinon.SinonStub;
 
     beforeEach(() => {
-      bcryptHashStub = sinon.stub(bcrypt, "hash");
+      bcryptjsHashStub = sinon.stub(bcryptjs, "hash");
       userModelCreateUserStub = sinon.stub(UserModel, "createUser");
       userModelGetUserByEmailStub = sinon.stub(UserModel, "getUserByEmail");
     });
 
     afterEach(() => {
-      bcryptHashStub.restore();
+      bcryptjsHashStub.restore();
       userModelCreateUserStub.restore();
       userModelGetUserByEmailStub.restore();
     });
 
     it("Should throw conflict error when user already exists", async () => {
-      bcryptHashStub.resolves("hashedPassword");
+      bcryptjsHashStub.resolves("hashedPassword");
       const user = {
         id: "1" as UUID,
         name: "User 1",
@@ -95,7 +95,7 @@ describe("User Service Test Suite", () => {
 
     it("Should create a new user when user does not exist", async () => {
       userModelGetUserByEmailStub.returns(undefined);
-      bcryptHashStub.resolves("hashedPassword");
+      bcryptjsHashStub.resolves("hashedPassword");
       const stubbedUser = {
         id: "2" as UUID,
         name: "User 2",

@@ -1,6 +1,6 @@
 import expect from "expect";
 import sinon from "sinon";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 const { sign } = jwt;
 import config from "../../../config";
@@ -14,7 +14,7 @@ import { Internal } from "../../../error/Internal";
 describe("Auth Service Test Suite", () => {
   describe("login", () => {
     let userServiceGetUserByEmailStub: sinon.SinonStub;
-    let bcryptCompareStub: sinon.SinonStub;
+    let bcryptjsCompareStub: sinon.SinonStub;
     let signStub: sinon.SinonStub;
 
     const user = {
@@ -27,13 +27,13 @@ describe("Auth Service Test Suite", () => {
 
     beforeEach(() => {
       userServiceGetUserByEmailStub = sinon.stub(UserService, "getUserByEmail");
-      bcryptCompareStub = sinon.stub(bcrypt, "compare");
+      bcryptjsCompareStub = sinon.stub(bcryptjs, "compare");
       signStub = sinon.stub(jwt, "sign");
     });
 
     afterEach(() => {
       userServiceGetUserByEmailStub.restore();
-      bcryptCompareStub.restore();
+      bcryptjsCompareStub.restore();
       signStub.restore();
     });
 
@@ -47,7 +47,7 @@ describe("Auth Service Test Suite", () => {
 
     it("Should throw Unauthorized error when password is invalid", async () => {
       userServiceGetUserByEmailStub.returns(user);
-      bcryptCompareStub.returns(false);
+      bcryptjsCompareStub.returns(false);
 
       await expect(() =>
         login({ email: "user1@email.com", password: "wrongpassword" })
@@ -56,7 +56,7 @@ describe("Auth Service Test Suite", () => {
 
     it("Should throw Internal error when JWT secret is not set", async () => {
       userServiceGetUserByEmailStub.returns(user);
-      bcryptCompareStub.returns(true);
+      bcryptjsCompareStub.returns(true);
       const originalSecret = config.jwt.secret;
       config.jwt.secret = undefined;
 
@@ -69,7 +69,7 @@ describe("Auth Service Test Suite", () => {
 
     it("Should return accessToken and refreshToken on successful login", async () => {
       userServiceGetUserByEmailStub.returns(user);
-      bcryptCompareStub.returns(true);
+      bcryptjsCompareStub.returns(true);
       signStub.onFirstCall().returns("accessToken");
       signStub.onSecondCall().returns("refreshToken");
 

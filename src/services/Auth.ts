@@ -6,7 +6,7 @@ import { NotFound } from "../error/NotFound";
 import { Unauthorized } from "../error/Unauthorized";
 import { IUser } from "../interfaces/User";
 import { getUserByEmail } from "./User"; //user.services.ts
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import loggerWithNameSpace from "../utils/logger";
 // import sign from "jsonwebtoken";
 
@@ -18,7 +18,7 @@ export async function login(data: Pick<IUser, "email" | "password">) {
     throw new NotFound("User does not exist with given email");
   }
   logger.info("compared found")
-  const isValidPassword = await bcrypt.compare(
+  const isValidPassword = await bcryptjs.compare(
     data.password,
     existingUser.password
   );
