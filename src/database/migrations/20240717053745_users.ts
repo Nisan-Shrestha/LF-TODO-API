@@ -22,7 +22,6 @@ export async function up(knex: Knex): Promise<void> {
 
     table.timestamp("updated_at").nullable();
 
-    table.uuid("updated_by").references("id").inTable(TABLE_NAME).nullable();
   });
 }
 

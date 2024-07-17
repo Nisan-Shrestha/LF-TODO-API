@@ -7,6 +7,24 @@ export const getUserByIDQuerySchema = Joi.object({
   }),
 }).options({ stripUnknown: true });
 
+export const getAllUsersSchema = Joi.object({
+  q: Joi.string().optional().messages({
+    "string.base": "query must be a string okay!",
+  }),
+  page: Joi.number()
+    .optional()
+    .messages({
+      "string.base": "page must be a number okay!",
+    })
+    .default(1),
+  size: Joi.number()
+    .optional()
+    .messages({
+      "string.base": "size must be a number okay!",
+    })
+    .default(10),
+}).options({ stripUnknown: true });
+
 export const updateUserByIDQuerySchema = Joi.object({
   id: Joi.string().required().messages({
     "string.base": "ID must be a string okay!",

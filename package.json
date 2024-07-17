@@ -4,8 +4,8 @@
   "main": "app.ts",
   "scripts": {
     "start": "nodemon src/app.ts",
-    "test": "mocha --require ts-node/register  './src/tests/unitTests/**/*.test.ts'",
-    "test:integration": "mocha --require ts-node/register  './src/tests/integrationTests/**/*.test.ts'",
+    "test": "mocha --require ts-node/register  './src/test/unit_test/**/*.test.ts'",
+    "test:integration": "mocha --require ts-node/register  './src/test/integration_test/**/*.test.ts'",
     "knex": "knex  --knexfile='./src/knexfile.ts'",
     "migrate:make": "npm run knex migrate:make --verbose",
     "migrate": "npm run knex migrate:latest --verbose",

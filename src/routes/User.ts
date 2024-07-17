@@ -18,6 +18,7 @@ import {
   getUserByIDQuerySchema,
   updateUserByIDBodySchema,
   updateUserByIDQuerySchema as DeleteUserByIDQuerySchema,
+  getAllUsersSchema,
 } from "../schema/user";
 import { requestHandler } from "../utils/reqHandler";
 
@@ -34,7 +35,12 @@ router.get(
 );
 router.get(
   "/",
-  requestHandler([authenticate, authorize("users.get"), getAllUser])
+  requestHandler([
+    authenticate,
+    authorize("users.get"),
+    validateReqQuery(getAllUsersSchema),
+    getAllUser,
+  ])
 );
 router.post(
   "/",

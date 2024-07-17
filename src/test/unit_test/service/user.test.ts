@@ -9,7 +9,7 @@ import {
 import expect from "expect";
 import sinon from "sinon";
 
-import * as UserModel from "../../../models/User";
+import { UserModel } from "../../../models/User";
 import { permission } from "process";
 import bcryptjs from "bcryptjs";
 import { create } from "domain";
@@ -59,7 +59,7 @@ describe("User Service Test Suite", () => {
 
     beforeEach(() => {
       bcryptjsHashStub = sinon.stub(bcryptjs, "hash");
-      userModelCreateUserStub = sinon.stub(UserModel, "createUser");
+      userModelCreateUserStub = sinon.stub(UserModel, "create");
       userModelGetUserByEmailStub = sinon.stub(UserModel, "getUserByEmail");
     });
 
@@ -81,13 +81,22 @@ describe("User Service Test Suite", () => {
       userModelGetUserByEmailStub.returns(user);
       userModelCreateUserStub.restore();
       await expect(
-        createUser({
-          id: "2" as UUID,
-          name: "User 2",
-          email: "user1@email.com",
-          password: "hashedPassword",
-          permissions: perms.userPerms,
-        } as IUser)
+        createUser(
+          {
+            id: "2" as UUID,
+            name: "User 2",
+            email: "user1@email.com",
+            password: "hashedPassword",
+            permissions: perms.userPerms,
+          } as IUser,
+          {
+            id: "0" as UUID,
+            name: "Admin",
+            email: "admin@email.com",
+            password: "hashedPassword",
+            permissions: perms.userPerms,
+          } as IUser
+        )
       ).rejects.toThrow(
         new Conflict("User with email user1@email.com already exists")
       );
@@ -105,13 +114,22 @@ describe("User Service Test Suite", () => {
       };
       userModelCreateUserStub.returns(stubbedUser);
 
-      const user = await createUser({
-        id: "2" as UUID,
-        name: "User 2",
-        email: "user2@email.com",
-        password: "hashedPassword",
-        permissions: perms.userPerms,
-      } as IUser);
+      const user = await createUser(
+        {
+          id: "2" as UUID,
+          name: "User 2",
+          email: "user2@email.com",
+          password: "hashedPassword",
+          permissions: perms.userPerms,
+        } as IUser,
+        {
+          id: "0" as UUID,
+          name: "Admin",
+          email: "admin@email.com",
+          password: "hashedPassword",
+          permissions: perms.userPerms,
+        } as IUser
+      );
 
       expect(user).toStrictEqual({
         id: "2",
@@ -139,17 +157,23 @@ describe("User Service Test Suite", () => {
       ];
       userModelGetAllUserStub.returns(users);
 
-      const res = await getAllUser();
+      const res = await getAllUser({ page: 1, size: 16 });
 
-      expect(res).toStrictEqual(users);
+      expect(res).toStrictEqual({
+        data: [...users],
+        meta: { page: 1, size: 2, total: 0 },
+      });
     });
 
     it("Should return an empty array when no users are found", async () => {
       userModelGetAllUserStub.returns([]);
 
-      const res = await getAllUser();
+      const res = await getAllUser({ page: 1, size: 16 });
 
-      expect(res).toStrictEqual([]);
+      expect(res).toStrictEqual({
+        data: [],
+        meta: { page: 1, size: 0, total: 0 },
+      });
     });
   });
 
@@ -157,7 +181,7 @@ describe("User Service Test Suite", () => {
     let userModelUpdateUserStub: sinon.SinonStub;
 
     beforeEach(() => {
-      userModelUpdateUserStub = sinon.stub(UserModel, "updateUser");
+      userModelUpdateUserStub = sinon.stub(UserModel, "update");
     });
 
     afterEach(() => {

@@ -1,7 +1,7 @@
 import { NextFunction, Response } from "express";
 import * as UserService from "../services/User";
 import { UUID } from "crypto";
-import { IUser } from "../interfaces/User";
+import { GetUserQuery, IUser } from "../interfaces/User";
 import { Request } from "../interfaces/auth";
 import loggerWithNameSpace from "../utils/logger";
 import HttpStatusCodes from "http-status-codes";
@@ -35,13 +35,14 @@ export async function getUserInfo(
 }
 
 export async function getAllUser(
-  req: Request,
+  req: Request<any, any, any, GetUserQuery>,
   res: Response,
   next: NextFunction
 ) {
   logger.info("Called getAllUser");
+  const { query } = req;
 
-  const service_response = await UserService.getAllUser();
+  const service_response = await UserService.getAllUser(query);
   if (!service_response) {
     logger.warn("User not found in getAllUser");
     throw new NotFound("Could not find users");
@@ -56,6 +57,7 @@ export async function createUser(
   next: NextFunction
 ) {
   const { body } = req;
+  const { user:reqUser } = req;
   const { email, password, name } = body;
   logger.info("Called createUser");
 
@@ -64,7 +66,7 @@ export async function createUser(
     throw new BadRequest("At least one of email, password, name is missing");
   }
 
-  const data = await UserService.createUser(body);
+  const data = await UserService.createUser(body,reqUser);
   if (data) {
     logger.info("User Created");
     res.status(HttpStatusCodes.ACCEPTED).json(data);

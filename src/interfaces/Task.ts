@@ -1,15 +1,20 @@
 import { UUID } from "crypto";
 
 export interface ITask {
-  id: UUID;
+  taskId: UUID;
   userID: UUID;
   detail: string;
   status: TaskStatus;
   createdAt: Date;
-  completedAt: Date | null;
+  updatedAt: Date | null;
 }
 
 export enum TaskStatus {
   pending,
   done,
+}
+
+export interface GetTaskQuery {
+  page?: number;
+  size?: number;
 }

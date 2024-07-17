@@ -14,7 +14,7 @@ const logger = loggerWithNameSpace("atuh services");
 export async function login(data: Pick<IUser, "email" | "password">) {
   const existingUser = await getUserByEmail(data.email);
   
-  throw new Unauthorized("Invalid password received");
+  // throw new Unauthorized("Invalid password received");
   if (!existingUser) {
     throw new NotFound("User does not exist with given email");
   }

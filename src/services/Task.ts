@@ -1,4 +1,4 @@
-import { ITask, TaskStatus } from "../interfaces/Task";
+import { GetTaskQuery, ITask, TaskStatus } from "../interfaces/Task";
 import * as taskModel from "../models/Task";
 import { UUID } from "node:crypto";
 import crypto from "crypto";
@@ -8,14 +8,27 @@ import loggerWithNameSpace from "../utils/logger";
 
 const logger = loggerWithNameSpace("TaskService");
 
-export async function getAllTasks(userID: UUID) {
-  logger.info(`Getting all tasks for user with ID: ${userID}`);
-  return await taskModel.getAllTasks(userID);
+export async function getAllTasks(userId: UUID, filter: GetTaskQuery) {
+  logger.info(`Getting all tasks for user with ID: ${userId}`);
+  let data = await taskModel.TaskModel.getAllTasks(userId, filter);
+  const count = await taskModel.TaskModel.count(userId);
+
+  const meta = {
+    page: filter.page,
+    size: data.length,
+    total: +count.count,
+  };
+
+  logger.info(
+    `Retrieved ${data.length} tasks of total ${ count} for user with ID: ${userId}`
+  );
+  // return data;
+  return { data, meta };
 }
 
 export async function getTaskById(tid: UUID, uid: UUID) {
   logger.info(`Getting task with ID: ${tid} for user with ID: ${uid}`);
-  const data = taskModel.getTaskById(tid, uid);
+  const data = taskModel.TaskModel.getTaskById(tid, uid);
   if (!data) {
     logger.error(`Task with ID: ${tid} not found for user with ID: ${uid}`);
     throw new NotFound(`Task with id: ${tid} not found for current user`);
@@ -26,16 +39,16 @@ export async function getTaskById(tid: UUID, uid: UUID) {
 export async function createTask(detail: string, uid: UUID) {
   logger.info(`Creating task for user with ID: ${uid}`);
   const task: ITask = {
-    id: crypto.randomUUID(),
+    taskId: crypto.randomUUID(),
     detail: detail,
     userID: uid,
     createdAt: new Date(),
     status: TaskStatus.pending,
-    completedAt: null,
+    updatedAt: null,
   };
-  const data = await taskModel.createTask(task);
-  if (data) {
-    logger.info(`Task created successfully with ID: ${data.id}`);
+  const data = await taskModel.TaskModel.createTask(task);
+  if (!!data) {
+    logger.info(`Task created successfully with ID: ${data.taskId}`);
     return {
       message: "Task created successfully",
       data,
@@ -60,9 +73,9 @@ export async function updateTaskById(
     status &&
     (status === "done" || status == "pending")
   ) {
-    data = await taskModel.updateTaskStatus(tid, status, uid);
+    data = await taskModel.TaskModel.updateTaskStatus(tid, status, uid);
   } else if (update === "detail" && typeof detail === "string") {
-    data = await taskModel.updateTask(tid, detail, uid);
+    data = await taskModel.TaskModel.updateTask(tid, detail, uid);
   }
   if (data) {
     logger.info(`Task with ID: ${tid} updated.`);
@@ -99,7 +112,7 @@ export async function deleteTaskById(
   data: ITask | null;
 }> {
   logger.info(`Deleting task with ID: ${tid} for user with ID: ${uid}`);
-  const data = await taskModel.deleteTask(tid, uid);
+  const data = await taskModel.TaskModel.deleteTask(tid, uid);
   if (data) {
     logger.info(`Task with ID: ${tid} deleted successfully`);
     return {

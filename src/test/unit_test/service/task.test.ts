@@ -8,7 +8,7 @@ import {
 import expect from "expect";
 import sinon from "sinon";
 
-import * as TaskModel from "../../../models/Task";
+import { TaskModel } from "../../../models/Task";
 import { ITask, TaskStatus } from "../../../interfaces/Task";
 import { UUID } from "crypto";
 import { NotFound } from "../../../error/NotFound";
@@ -29,17 +29,20 @@ describe("Task Service Test Suite", () => {
     it("Should return all tasks for a user", async () => {
       const tasks: ITask[] = [
         {
-          id: "1" as UUID,
+          taskId: "1" as UUID,
           detail: "Task 1",
-          userID: "user1" as UUID,
+          userID: "123456" as UUID,
           createdAt: new Date(),
           status: TaskStatus.pending,
-          completedAt: null,
+          updatedAt: null,
         },
       ];
       taskModelGetAllTasksStub.returns(tasks);
-      const res = await getAllTasks("user1" as UUID);
-      expect(res).toStrictEqual(tasks);
+      const res = await getAllTasks("user1" as UUID, { page: 1, size: 16 });
+      expect(res).toStrictEqual({
+        tasks: [...tasks],
+        meta: { page: 1, size: 2, total: 0 },
+      });
     });
   });
 
@@ -57,19 +60,21 @@ describe("Task Service Test Suite", () => {
     it("Should throw error when task is not found", async () => {
       taskModelGetTaskByIdStub.returns(undefined);
 
-      await expect(() => getTaskById("100" as UUID, "user1" as UUID)).rejects.toThrow(
+      await expect(() =>
+        getTaskById("100" as UUID, "user1" as UUID)
+      ).rejects.toThrow(
         new NotFound("Task with id: 100 not found for current user")
       );
     });
 
     it("Should return the task when task is found", async () => {
       const task: ITask = {
-        id: "1" as UUID,
+        taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "user1" as UUID,
+        userID: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
-        completedAt: null,
+        updatedAt: null,
       };
       taskModelGetTaskByIdStub.returns(task);
       const res = await getTaskById("1" as UUID, "user1" as UUID);
@@ -90,16 +95,19 @@ describe("Task Service Test Suite", () => {
 
     it("Should create and return a new task", async () => {
       const task: ITask = {
-        id: "1" as UUID,
+        taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "user1" as UUID,
+        userID: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
-        completedAt: null,
+        updatedAt: null,
       };
       taskModelCreateTaskStub.returns(task);
       const res = await createTask("Task 1", "user1" as UUID);
-      expect(res).toStrictEqual({ message: "Task created successfully", data: task });
+      expect(res).toStrictEqual({
+        message: "Task created successfully",
+        data: task,
+      });
     });
 
     it("Should throw an error if task creation fails", async () => {
@@ -127,38 +135,62 @@ describe("Task Service Test Suite", () => {
 
     it("Should update task detail and return updated task", async () => {
       const task: ITask = {
-        id: "1" as UUID,
+        taskId: "1" as UUID,
         detail: "Updated Task 1",
-        userID: "user1" as UUID,
+        userID: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
-        completedAt: null,
+        updatedAt: null,
       };
       taskModelUpdateTaskStub.returns(task);
-      const res = await updateTaskById("1" as UUID, "detail", "user1" as UUID, "Updated Task 1");
-      expect(res).toStrictEqual({ message: "Task updated successfully", data: task });
+      const res = await updateTaskById(
+        "1" as UUID,
+        "detail",
+        "user1" as UUID,
+        "Updated Task 1"
+      );
+      expect(res).toStrictEqual({
+        message: "Task updated successfully",
+        data: task,
+      });
     });
 
     it("Should update task status and return updated task", async () => {
       const task: ITask = {
-        id: "1" as UUID,
+        taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "user1" as UUID,
+        userID: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.done,
-        completedAt: new Date(),
+        updatedAt: new Date(),
       };
       taskModelUpdateTaskStatusStub.returns(task);
-      const res = await updateTaskById("1" as UUID, "status", "user1" as UUID, undefined, "done");
-      expect(res).toStrictEqual({ message: "Task updated successfully", data: task });
+      const res = await updateTaskById(
+        "1" as UUID,
+        "status",
+        "user1" as UUID,
+        undefined,
+        "done"
+      );
+      expect(res).toStrictEqual({
+        message: "Task updated successfully",
+        data: task,
+      });
     });
 
     it("Should throw an error when task is not found", async () => {
       taskModelUpdateTaskStub.returns(null);
 
       await expect(() =>
-        updateTaskById("100" as UUID, "detail", "user1" as UUID, "Updated Task 1")
-      ).rejects.toThrow(new NotFound("Task with id: 100 not found for current user"));
+        updateTaskById(
+          "100" as UUID,
+          "detail",
+          "user1" as UUID,
+          "Updated Task 1"
+        )
+      ).rejects.toThrow(
+        new NotFound("Task with id: 100 not found for current user")
+      );
     });
   });
 
@@ -175,17 +207,17 @@ describe("Task Service Test Suite", () => {
 
     it("Should delete task when task is found", async () => {
       const task: ITask = {
-        id: "1" as UUID,
+        taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "user1" as UUID,
+        userID: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
-        completedAt: null,
+        updatedAt: null,
       };
       taskModelDeleteTaskStub.returns(task);
-  
+
       const res = await deleteTaskById("1" as UUID, "user1" as UUID);
-  
+
       expect(res).toStrictEqual({
         message: "Successfully deleted",
         data: task,
@@ -195,7 +227,9 @@ describe("Task Service Test Suite", () => {
     it("Should throw an error when task is not found", async () => {
       taskModelDeleteTaskStub.returns(null);
 
-      await expect(() => deleteTaskById("100" as UUID, "user1" as UUID)).rejects.toThrow(
+      await expect(() =>
+        deleteTaskById("100" as UUID, "user1" as UUID)
+      ).rejects.toThrow(
         new NotFound("Task with id: 100 not found for current user")
       );
     });
