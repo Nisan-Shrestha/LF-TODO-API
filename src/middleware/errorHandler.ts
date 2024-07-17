@@ -10,10 +10,12 @@ import { Unauthorized } from "../error/Unauthorized";
 import { BadRequest } from "../error/BadRequest";
 import { NotFound } from "../error/NotFound";
 import { Conflict } from "../error/Conflict";
+import { log } from "node:console";
 
 const logger = loggerWithNameSpace("ErrorHandler");
 
 export function notFoundError(req: Request, res: Response) {
+  logger.info("reached here");
   return res.status(HttpStatusCodes.NOT_FOUND).json({
     message: "Route or resource Not Found",
   });
@@ -25,12 +27,16 @@ export function genericErrorHandler(
   res: Response,
   next: NextFunction
 ) {
+
+  logger.info("reached here");
+  logger.error(error);
   if (error.stack) {
     logger.error(error.stack);
   }
   let statusCode: number;
   let errorMsg: string;
 
+  logger.error("error is:", error);
   switch (true) {
     case error instanceof Unauthorized:
       statusCode = HttpStatusCodes.UNAUTHORIZED;
@@ -59,8 +65,5 @@ export function genericErrorHandler(
 
   return res.status(statusCode).json({
     message: errorMsg,
-  });
-  return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
-    message: "Internal Server Error",
   });
 }

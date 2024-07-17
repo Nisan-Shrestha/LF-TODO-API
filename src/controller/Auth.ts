@@ -30,8 +30,8 @@ export async function login(
     return;
   }
 
-  // logger.error("Login Failed:");
-  // throw new Unauthorized("Login Failed");
+  logger.error("Login Failed:");
+  throw new Unauthorized("Login Failed");
 }
 
 export async function refresh(req: Request, res: Response, next: NextFunction) {

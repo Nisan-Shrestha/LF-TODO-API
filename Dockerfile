@@ -10,4 +10,8 @@ EXPOSE 8000
 
 COPY .  .
 
-CMD ["npm","run", "start"]
+RUN npm run migrate && npm run seed:run
+
+
+# CMD ["npm","run", "start"]
+# CMD ["npm","run", "test"]

@@ -43,18 +43,18 @@ describe("Auth Integration Test Suite", () => {
       expect(decodedRefreshToken.email).toBe(userCredentials.email);
     });
 
-    // it.only("Should return 401 for invalid credentials", async () => {
-    //   const invalidCredentials = {
-    //     email: "Shrestha@gmail.com",
-    //     password: "wrongpassword",
-    //   };
+    it.only("Should return 401 for invalid password", async () => {
+      const invalidCredentials = {
+        email: "Shrestha@gmail.com",
+        password: "wrongpassword",
+      };
 
-    //   const response = await request(app)
-    //     .post("/auth/login")
-    //     .send(invalidCredentials);
-    //   console.log("BODY:",response.body)
-    //   expect(response.status).toBe(401);
-    //   expect(response.body).toHaveProperty("message", "Login Failed");
-    // });
+      const response = await request(app)
+        .post("/auth/login")
+        .send(invalidCredentials);
+      console.log("BODY:",response.body)
+      expect(response.status).toBe(401);
+      expect(response.body).toHaveProperty("message", "Login Failed");
+    });
   });
 });

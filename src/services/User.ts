@@ -1,4 +1,4 @@
-import { hash } from "bcrypt";
+import { hash } from "bcryptjs";
 import crypto, { UUID } from "crypto";
 import { NotFound } from "../error/NotFound";
 import { IUser } from "../interfaces/User";

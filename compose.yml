@@ -1,0 +1,49 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: todo_api_container
+    # image: s0skai/lf-backend-todo:latest
+    environment:
+      - PORT=${PORT}
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - ${PORT}:${PORT}
+    command: >
+      sh -c "ln -snf /usr/share/zoneinfo/${TIME_ZONE} /etc/localtime &&  echo ${TIME_ZONE} > /etc/timezone && npm run start"
+    volumes:
+      - .:/app
+    depends_on:
+      - database_todo
+
+  database_todo:
+    container_name: postgres_todo
+    image: postgres
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - postgres_data_todo:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  pgadmin_todo:
+    container_name: pgadmin_todo
+    image: dpage/pgadmin4:8.9
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_MAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PW}
+    ports:
+      - "5050:80"
+    restart: always
+    volumes:
+      - pgadmin_data_todo:/var/lib/pgadmin
+    depends_on:
+      - database_todo
+
+volumes:
+  postgres_data_todo:
+  pgadmin_data_todo:
