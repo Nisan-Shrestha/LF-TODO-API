@@ -36,7 +36,7 @@ export async function getAllUser(filter: GetUserQuery) {
   const meta = {
     page: filter.page,
     size: data.length,
-    total: +count.count,
+    total: +count,
   };
 
   logger.info(`Retrieved ${data.length} users of total ${count}`);

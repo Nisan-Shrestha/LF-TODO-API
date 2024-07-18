@@ -16,11 +16,11 @@ export async function getAllTasks(userId: UUID, filter: GetTaskQuery) {
   const meta = {
     page: filter.page,
     size: data.length,
-    total: +count.count,
+    total: +count,
   };
 
   logger.info(
-    `Retrieved ${data.length} tasks of total ${ count} for user with ID: ${userId}`
+    `Retrieved ${data.length} tasks of total ${count} for user with ID: ${userId}`
   );
   // return data;
   return { data, meta };

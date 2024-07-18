@@ -17,13 +17,16 @@ import { Internal } from "../../../error/Internal";
 describe("Task Service Test Suite", () => {
   describe("getAllTasks", () => {
     let taskModelGetAllTasksStub: sinon.SinonStub;
+    let taskModelCountStub: sinon.SinonStub;
 
     beforeEach(() => {
       taskModelGetAllTasksStub = sinon.stub(TaskModel, "getAllTasks");
+      taskModelCountStub = sinon.stub(TaskModel, "count");
     });
 
     afterEach(() => {
       taskModelGetAllTasksStub.restore();
+      taskModelCountStub.restore();
     });
 
     it("Should return all tasks for a user", async () => {
@@ -37,11 +40,12 @@ describe("Task Service Test Suite", () => {
           updatedAt: null,
         },
       ];
-      taskModelGetAllTasksStub.returns(tasks);
-      const res = await getAllTasks("user1" as UUID, { page: 1, size: 16 });
+      taskModelGetAllTasksStub.returns([...tasks]);
+      taskModelCountStub.returns(1);
+      const res = await getAllTasks("123456" as UUID, { page: 1, size: 16 });
       expect(res).toStrictEqual({
-        tasks: [...tasks],
-        meta: { page: 1, size: 2, total: 0 },
+        data: [...tasks],
+        meta: { page: 1, size: 1, total: 1},
       });
     });
   });
@@ -61,7 +65,7 @@ describe("Task Service Test Suite", () => {
       taskModelGetTaskByIdStub.returns(undefined);
 
       await expect(() =>
-        getTaskById("100" as UUID, "user1" as UUID)
+        getTaskById("100" as UUID, "123456" as UUID)
       ).rejects.toThrow(
         new NotFound("Task with id: 100 not found for current user")
       );
@@ -77,7 +81,7 @@ describe("Task Service Test Suite", () => {
         updatedAt: null,
       };
       taskModelGetTaskByIdStub.returns(task);
-      const res = await getTaskById("1" as UUID, "user1" as UUID);
+      const res = await getTaskById("1" as UUID, "123456" as UUID);
       expect(res).toStrictEqual(task);
     });
   });
@@ -103,7 +107,7 @@ describe("Task Service Test Suite", () => {
         updatedAt: null,
       };
       taskModelCreateTaskStub.returns(task);
-      const res = await createTask("Task 1", "user1" as UUID);
+      const res = await createTask("Task 1", "123456" as UUID);
       expect(res).toStrictEqual({
         message: "Task created successfully",
         data: task,
@@ -113,9 +117,9 @@ describe("Task Service Test Suite", () => {
     it("Should throw an error if task creation fails", async () => {
       taskModelCreateTaskStub.returns(null);
 
-      await expect(() => createTask("Task 1", "user1" as UUID)).rejects.toThrow(
-        new Internal("Failed to create Task")
-      );
+      await expect(() =>
+        createTask("Task 1", "123456" as UUID)
+      ).rejects.toThrow(new Internal("Failed to create Task"));
     });
   });
 
@@ -146,7 +150,7 @@ describe("Task Service Test Suite", () => {
       const res = await updateTaskById(
         "1" as UUID,
         "detail",
-        "user1" as UUID,
+        "123456" as UUID,
         "Updated Task 1"
       );
       expect(res).toStrictEqual({
@@ -168,7 +172,7 @@ describe("Task Service Test Suite", () => {
       const res = await updateTaskById(
         "1" as UUID,
         "status",
-        "user1" as UUID,
+        "123456" as UUID,
         undefined,
         "done"
       );
@@ -185,7 +189,7 @@ describe("Task Service Test Suite", () => {
         updateTaskById(
           "100" as UUID,
           "detail",
-          "user1" as UUID,
+          "123456" as UUID,
           "Updated Task 1"
         )
       ).rejects.toThrow(
@@ -216,7 +220,7 @@ describe("Task Service Test Suite", () => {
       };
       taskModelDeleteTaskStub.returns(task);
 
-      const res = await deleteTaskById("1" as UUID, "user1" as UUID);
+      const res = await deleteTaskById("1" as UUID, "123456" as UUID);
 
       expect(res).toStrictEqual({
         message: "Successfully deleted",
@@ -228,7 +232,7 @@ describe("Task Service Test Suite", () => {
       taskModelDeleteTaskStub.returns(null);
 
       await expect(() =>
-        deleteTaskById("100" as UUID, "user1" as UUID)
+        deleteTaskById("100" as UUID, "123456" as UUID)
       ).rejects.toThrow(
         new NotFound("Task with id: 100 not found for current user")
       );

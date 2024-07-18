@@ -13,12 +13,14 @@ const pathToUserData = path.join(__dirname, "../data/users.json");
 export class UserModel extends BaseModel {
   static count(filter: GetUserQuery) {
     const { q } = filter;
-
-    const query = this.queryBuilder().count("*").table("users").first();
-
+    let query;
     if (q) {
-      query.whereLike("name", `%${q}%`);
-    }
+      query = this.queryBuilder()
+        .count("*")
+        .table("users")
+        .whereLike("name", `%${q}%`)
+        .first();
+    } else query = this.queryBuilder().count("*").table("users").first();
 
     return query;
   }

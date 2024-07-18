@@ -141,13 +141,16 @@ describe("User Service Test Suite", () => {
 
   describe("getAllUser", () => {
     let userModelGetAllUserStub: sinon.SinonStub;
+    let userModelCoubtStub: sinon.SinonStub;
 
     beforeEach(() => {
       userModelGetAllUserStub = sinon.stub(UserModel, "getAllUser");
+      userModelCoubtStub = sinon.stub(UserModel, "count");
     });
 
     afterEach(() => {
       userModelGetAllUserStub.restore();
+      userModelCoubtStub.restore();
     });
 
     it("Should return all users", async () => {
@@ -156,17 +159,19 @@ describe("User Service Test Suite", () => {
         { id: "2", name: "User 2", email: "user2@email.com" },
       ];
       userModelGetAllUserStub.returns(users);
+      userModelCoubtStub.returns(2);
 
       const res = await getAllUser({ page: 1, size: 16 });
 
       expect(res).toStrictEqual({
         data: [...users],
-        meta: { page: 1, size: 2, total: 0 },
+        meta: { page: 1, size: 2, total: 2 },
       });
     });
 
     it("Should return an empty array when no users are found", async () => {
       userModelGetAllUserStub.returns([]);
+      userModelCoubtStub.returns(0);
 
       const res = await getAllUser({ page: 1, size: 16 });
 
