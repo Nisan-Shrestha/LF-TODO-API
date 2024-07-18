@@ -8,7 +8,7 @@ export function requestHandler(callbacks: Function[]) {
         await callbacks[i](req, res, next);
       }
     } catch (e) {
-      console.log(e);
+      // console.log(e);
       next(e);
     }
   };

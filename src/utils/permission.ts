@@ -1,5 +1,5 @@
 export const perms = {
-  superPerms: ["users.get", "users.post", "user.put", "user.delete"],
-  userPerms: [],
+  superPerms: "isAdmin",
+  userPerms: "isUser",
 };
 // const userPerms = ["user.putSelf", "user.deleteSelf"];

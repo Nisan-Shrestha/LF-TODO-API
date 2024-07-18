@@ -41,7 +41,7 @@ export async function createTask(detail: string, uid: UUID) {
   const task: ITask = {
     taskId: crypto.randomUUID(),
     detail: detail,
-    userID: uid,
+    userId: uid,
     createdAt: new Date(),
     status: TaskStatus.pending,
     updatedAt: null,
@@ -68,13 +68,12 @@ export async function updateTaskById(
 ): Promise<{ message: string; data: ITask | null }> {
   logger.info(`Updating task with ID: ${tid} for user with ID: ${uid}`);
   let data: ITask | null = null;
-  if (
-    update === "status" &&
-    status &&
-    (status === "done" || status == "pending")
-  ) {
+  logger.info(` status:${status} : update:${update}`);
+  if (update === "status") {
+    logger.info(`Updating status`);
     data = await taskModel.TaskModel.updateTaskStatus(tid, status, uid);
   } else if (update === "detail" && typeof detail === "string") {
+    logger.info(`Updating detial`);
     data = await taskModel.TaskModel.updateTask(tid, detail, uid);
   }
   if (data) {

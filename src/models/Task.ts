@@ -7,9 +7,10 @@ import { NotFound } from "../error/NotFound";
 import { BaseModel } from "./base";
 import { IUser } from "../interfaces/User";
 import { BadRequest } from "../error/BadRequest";
+import { log } from "node:console";
+import loggerWithNameSpace from "../utils/logger";
 
-const pathToTasks = path.join(__dirname, "../data/tasks.json");
-
+const logger = loggerWithNameSpace("TaskModel");
 export class TaskModel extends BaseModel {
   // static async create(user: IUser) {
   //   const userToCreate = {
@@ -42,7 +43,8 @@ export class TaskModel extends BaseModel {
     let query = this.queryBuilder()
       .select("*")
       .table("tasks")
-      .where(`taskId = '${taskId}' AND userId = '${userId}'`)
+      .where({ taskId: taskId, userId: userId })
+      // .where("taskId", taskId)
       .first();
     await query;
     if (!query) {
@@ -57,48 +59,57 @@ export class TaskModel extends BaseModel {
   }
 
   static async updateTask(tid: UUID, detail: string, uid: UUID) {
+    logger.info("Updating task");
     let taskToUpdate = await this.queryBuilder()
-      .select("*")
-      .table("tasks")
-      .where(`taskId = '${tid}' AND userId = '${uid}'`)
-      .first();
+    .select("*")
+    .table("tasks")
+    .where({ taskId: tid, userId: uid })
+    .first();
+    logger.info("checked for task");
     if (!taskToUpdate) {
       throw new BadRequest(`User with id ${tid} not found`);
     }
-
+    
     taskToUpdate = { ...taskToUpdate, detail: detail, updatedAt: new Date() };
-
+    
+    logger.info("attempting update");
     const query = this.queryBuilder()
-      .update(taskToUpdate)
-      .table("tasks")
-      .where(`taskId = '${tid}' AND userId = '${uid}'`);
-
+    .update(taskToUpdate)
+    .table("tasks")
+    .where({ taskId: tid, userId: uid });
+    
+    logger.info("updated");
+    
     await query;
     return taskToUpdate;
   }
-
+  
   static async updateTaskStatus(tid: UUID, status: string, uid: UUID) {
+    logger.info("Updating task");
     let taskToUpdate = await this.queryBuilder()
-      .select("*")
-      .table("tasks")
-      .where(`taskId = '${tid}' AND userId = '${uid}'`)
-      .first();
+    .select("*")
+    .table("tasks")
+    .where({ taskId: tid, userId: uid })
+    .first();
     if (!taskToUpdate) {
       throw new BadRequest(`User with id ${tid} not found`);
     }
+    logger.info(`User FOund: ${uid} `);
     let changedStatus;
     if (status == "done") changedStatus = TaskStatus.done;
     if (status == "pending") changedStatus = TaskStatus.pending;
-
+    
     taskToUpdate = {
       ...taskToUpdate,
       status: changedStatus,
       updatedAt: new Date(),
     };
+    logger.info("attempt update");
     const query = this.queryBuilder()
-      .update(taskToUpdate)
-      .table("tasks")
-      .where(`taskId = '${tid}' AND userId = '${uid}'`);
+    .update(taskToUpdate)
+    .table("tasks")
+    .where({ taskId: tid, userId: uid });
+    logger.info("updated");
 
     await query;
     return taskToUpdate;
@@ -108,12 +119,12 @@ export class TaskModel extends BaseModel {
       .select("*")
       .table("tasks")
       .first()
-      .where(`taskId = '${id}' AND userId = '${uid}'`);
+      .where({ taskId: id, userId: uid });
     if (!taskToDelete) return null;
     let Response = await this.queryBuilder()
       .delete()
       .table("tasks")
-      .where(`taskId = '${id}' AND userId = '${uid}'`);
+      .where({ taskId: id, userId: uid });
 
     if (!!Response) return taskToDelete;
   }

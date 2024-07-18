@@ -2,7 +2,7 @@ import { UUID } from "crypto";
 
 export interface ITask {
   taskId: UUID;
-  userID: UUID;
+  userId: UUID;
   detail: string;
   status: TaskStatus;
   createdAt: Date;

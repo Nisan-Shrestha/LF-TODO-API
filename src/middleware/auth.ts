@@ -31,11 +31,11 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 export function authorize(permission: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = req.user!;
-
-    if (!user.permissions.includes(permission)) {
+    console.log("aksndkansdknasd: " + user.permissions + user.permissions.split(",").includes(permission));
+    if (!user.permissions.split(",").includes(permission)) {
+      console.log("qweqweyquwe")
       next(new Error("Forbidden"));
     }
 
-    next();
   };
 }

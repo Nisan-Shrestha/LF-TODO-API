@@ -15,7 +15,7 @@ import { log } from "node:console";
 const logger = loggerWithNameSpace("ErrorHandler");
 
 export function notFoundError(req: Request, res: Response) {
-  logger.info("reached here");
+  logger.info("reached here generic");
   return res.status(HttpStatusCodes.NOT_FOUND).json({
     message: "Route or resource Not Found",
   });

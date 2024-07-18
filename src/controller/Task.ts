@@ -6,24 +6,30 @@ import loggerWithNameSpace from "../utils/logger";
 import { BadRequest } from "../error/BadRequest";
 import { Request } from "../interfaces/auth";
 import { Internal } from "../error/Internal";
+import { GetTaskQuery } from "../interfaces/Task";
 const logger = loggerWithNameSpace("TaskController");
 
-export async function getAllTasks(req: Request, res: Response) {
+export async function getAllTasks(
+  req: Request<any, any, any, GetTaskQuery>,
+  res: Response
+) {
   logger.info("Getting all tasks");
   const user = req.user;
+  const { query } = req;
+
   if (!user) {
     logger.info("Getting all tasks");
     throw new Internal("User not forwarded by authenticator found");
   }
-  const data = await taskService.getAllTasks(user.id);
+  const data = await taskService.getAllTasks(user.id, query);
   if (!data) {
     logger.error("Unable to find tasks");
     throw new NotFound("Unable to find tasks");
   }
-  if (data.length == 0) logger.warn("Tasks empty");
+  if (data.data.length == 0) logger.warn("Tasks empty");
   else logger.info("Tasks found");
 
-  res.status(200).json([...data]);
+  res.status(200).json([...data.data]);
   return;
 }
 
@@ -71,7 +77,7 @@ export async function updateTaskById(req: Request, res: Response) {
     logger.info("Getting all tasks");
     throw new Internal("User not forwarded by authenticator found");
   }
-  const userID = user.id;
+  const userId = user.id;
   if (!id) {
     logger.error("Id is required");
     throw new BadRequest("Id is required");
@@ -82,7 +88,7 @@ export async function updateTaskById(req: Request, res: Response) {
   const result = await taskService.updateTaskById(
     id as UUID,
     update as string,
-    userID,
+    userId,
     detail,
     status
   );

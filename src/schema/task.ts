@@ -7,6 +7,21 @@ export const getTaskByIDSchema = Joi.object({
   }),
 }).options({ stripUnknown: true });
 
+export const getAllTasksSchema = Joi.object({
+  page: Joi.number()
+    .optional()
+    .messages({
+      "string.base": "page must be a number okay!",
+    })
+    .default(1),
+  size: Joi.number()
+    .optional()
+    .messages({
+      "string.base": "size must be a number okay!",
+    })
+    .default(10),
+}).options({ stripUnknown: true });
+
 export const createTaskSchema = Joi.object({
   detail: Joi.string().required().messages({
     "string.base": "Detail must be a string okay!",
@@ -31,7 +46,7 @@ export const updateTaskByIDBodySchema = Joi.object({
 }).options({ stripUnknown: true });
 
 export const updateTaskByIDQuerySchema = Joi.object({
-  update: Joi.string().valid("done", "pending").required().messages({
+  update: Joi.string().valid("status", "detail").required().messages({
     "string.base": "update must be a string okay!",
     "any.only": "update must be either 'done' or 'pending'",
     "any.required": "update is required",

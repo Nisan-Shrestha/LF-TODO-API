@@ -34,7 +34,7 @@ describe("Task Service Test Suite", () => {
         {
           taskId: "1" as UUID,
           detail: "Task 1",
-          userID: "123456" as UUID,
+          userId: "123456" as UUID,
           createdAt: new Date(),
           status: TaskStatus.pending,
           updatedAt: null,
@@ -75,7 +75,7 @@ describe("Task Service Test Suite", () => {
       const task: ITask = {
         taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "123456" as UUID,
+        userId: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
         updatedAt: null,
@@ -101,7 +101,7 @@ describe("Task Service Test Suite", () => {
       const task: ITask = {
         taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "123456" as UUID,
+        userId: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
         updatedAt: null,
@@ -141,7 +141,7 @@ describe("Task Service Test Suite", () => {
       const task: ITask = {
         taskId: "1" as UUID,
         detail: "Updated Task 1",
-        userID: "123456" as UUID,
+        userId: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
         updatedAt: null,
@@ -163,7 +163,7 @@ describe("Task Service Test Suite", () => {
       const task: ITask = {
         taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "123456" as UUID,
+        userId: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.done,
         updatedAt: new Date(),
@@ -213,7 +213,7 @@ describe("Task Service Test Suite", () => {
       const task: ITask = {
         taskId: "1" as UUID,
         detail: "Task 1",
-        userID: "123456" as UUID,
+        userId: "123456" as UUID,
         createdAt: new Date(),
         status: TaskStatus.pending,
         updatedAt: null,

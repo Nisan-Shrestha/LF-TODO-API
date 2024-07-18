@@ -28,7 +28,7 @@ router.get(
   "/:id",
   requestHandler([
     authenticate,
-    authorize("users.get"),
+    authorize("isAdmin"),
     validateReqParams(getUserByIDQuerySchema),
     getUserInfo,
   ])
@@ -37,7 +37,7 @@ router.get(
   "/",
   requestHandler([
     authenticate,
-    authorize("users.get"),
+    authorize("isAdmin"),
     validateReqQuery(getAllUsersSchema),
     getAllUser,
   ])
@@ -46,7 +46,7 @@ router.post(
   "/",
   requestHandler([
     authenticate,
-    authorize("users.post"),
+    authorize("isAdmin"),
     validateReqBody(createUserSchema),
     createUser,
   ])
@@ -57,7 +57,7 @@ router.put(
   "/",
   requestHandler([
     authenticate,
-    authorize("users.put"),
+    authorize("isAdmin"),
     validateReqQuery(DeleteUserByIDQuerySchema),
     validateReqBody(updateUserByIDBodySchema),
     updateUser,
@@ -68,7 +68,7 @@ router.delete(
   "/",
   requestHandler([
     authenticate,
-    authorize("users.delete"),
+    authorize("isAdmin"),
     validateReqQuery(DeleteUserByIDQuerySchema),
     deleteUser,
   ])

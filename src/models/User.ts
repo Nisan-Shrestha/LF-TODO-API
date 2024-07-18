@@ -60,7 +60,8 @@ export class UserModel extends BaseModel {
   }
 
   static async create(user: IUser, reqUser: IUser) {
-    const userExists = UserModel.getUserByEmail(user.email);
+    const userExists = await UserModel.getUserByEmail(user.email);
+    console.log(userExists);
     if (userExists) {
       throw new Conflict(`User with email ${user.email} already exists`);
     }

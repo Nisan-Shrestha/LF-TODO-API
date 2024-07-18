@@ -15,6 +15,7 @@ import {
 import {
   createTaskSchema,
   deleteTaskByIDSchema,
+  getAllTasksSchema,
   getTaskByIDSchema,
   updateTaskByIDBodySchema,
   updateTaskByIDParamsSchema,
@@ -24,7 +25,14 @@ import { requestHandler } from "../utils/reqHandler";
 
 const router = express();
 
-router.get("/", requestHandler([authenticate, getAllTasks]));
+router.get(
+  "/",
+  requestHandler([
+    authenticate,
+    validateReqQuery(getAllTasksSchema),
+    getAllTasks,
+  ])
+);
 router.get(
   "/:id",
   requestHandler([
